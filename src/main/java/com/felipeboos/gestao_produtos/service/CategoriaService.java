@@ -1,5 +1,7 @@
 package com.felipeboos.gestao_produtos.service;
 
+import com.felipeboos.gestao_produtos.dto.categoria.CategoriaRequestDTO;
+import com.felipeboos.gestao_produtos.dto.categoria.CategoriaResponseDTO;
 import com.felipeboos.gestao_produtos.entity.Categoria;
 import com.felipeboos.gestao_produtos.repository.CategoriaRepository;
 import org.springframework.stereotype.Service;
@@ -13,11 +15,17 @@ public class CategoriaService {
         this.repository = repository;
     }
 
-    public Categoria salvarCategoria(Categoria categoria) {
+    public CategoriaResponseDTO salvarCategoria(CategoriaRequestDTO dto) {
+
+        Categoria categoria = Categoria.builder()
+                .nome(dto.getNome())
+                .descricao(dto.getDescricao())
+                .build();
+
         return repository.saveAndFlush(categoria);
     }
 
-    public Categoria buscarCategoriaPorId(Long id) {
+    public CategoriaRequestDTO buscarCategoriaPorId(Long id) {
 
         return repository.findById(id).orElseThrow(
                 () -> new RuntimeException("Id nao encontrado")
