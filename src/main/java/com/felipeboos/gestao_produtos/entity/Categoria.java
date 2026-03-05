@@ -1,5 +1,8 @@
 package com.felipeboos.gestao_produtos.entity;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,4 +24,7 @@ public class Categoria extends EntidadeBase{
 
     @Column(name = "descricao")
     private String descricao;
+
+    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Produto> produtos = new ArrayList<>();
 }

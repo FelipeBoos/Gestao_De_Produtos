@@ -21,6 +21,10 @@ public class Produto extends EntidadeBase {
     @Column(name = "descricao")
     private String descricao;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
+
     @Column(name = "precoCusto")
     private BigDecimal precoCusto;
 

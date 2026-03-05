@@ -35,7 +35,7 @@ public class CategoriaService {
         repository.deleteById(id);
     }
 
-    public void atualizarPorId(Long id, Categoria categoriaPatch) {
+    public void atualizarCategoriaPorId(Long id, Categoria categoriaPatch) {
         Categoria categoriaEntity = buscarCategoriaPorId(id);
 
         aplicarAlteracoes(categoriaEntity, categoriaPatch);
