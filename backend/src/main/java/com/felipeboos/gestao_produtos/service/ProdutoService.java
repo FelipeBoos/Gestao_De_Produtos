@@ -9,6 +9,9 @@ import com.felipeboos.gestao_produtos.repository.CategoriaRepository;
 import com.felipeboos.gestao_produtos.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class ProdutoService {
 
@@ -37,13 +40,25 @@ public class ProdutoService {
         return ProdutoResponseDTO.fromEntity(produto);
     }
 
-    public ProdutoResponseDTO buscarProdutoPorNome(String nome) {
+    public List<ProdutoResponseDTO> buscarProdutoPorNome(String nome) {
 
         Produto produto =  repository.findByNome(nome).orElseThrow(
                 () -> new RuntimeException("Nome não encontrado")
         );
 
-        return ProdutoResponseDTO.fromEntity(produto);
+        return List.of(ProdutoResponseDTO.fromEntity(produto));
+    }
+
+    public List<ProdutoResponseDTO> listarTodosOsProdutos() {
+        List<Produto> listaProdutos = repository.findAll();
+
+        List<ProdutoResponseDTO> listaProdutosResponse = new ArrayList<>();
+
+        for (Produto produto : listaProdutos) {
+            listaProdutosResponse.add(ProdutoResponseDTO.fromEntity(produto));
+        }
+
+        return listaProdutosResponse;
     }
 
     public void deletarProdutoPorId(Long id) {

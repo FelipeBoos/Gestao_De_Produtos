@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/produtos")
 @RequiredArgsConstructor
@@ -22,8 +24,13 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<ProdutoResponseDTO> buscarProdutoPorNome(@RequestParam String nome) {
-        return ResponseEntity.ok(produtoService.buscarProdutoPorNome(nome));
+    public ResponseEntity<List<ProdutoResponseDTO>> listarProdutos(
+            @RequestParam(required=false) String nome) {
+        if (nome != null) {
+            return ResponseEntity.ok(produtoService.buscarProdutoPorNome(nome));
+        }
+
+        return ResponseEntity.ok(produtoService.listarTodosOsProdutos());
     }
 
     @PostMapping

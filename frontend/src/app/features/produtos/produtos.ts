@@ -6,4 +6,14 @@ import { Component } from '@angular/core';
   templateUrl: './produtos.html',
   styleUrl: './produtos.css',
 })
-export class Produtos {}
+export class Produtos {
+
+
+  incluirProduto() {
+    alert("Incluir produto: Ainda não implementado");
+  }
+
+  filtrarProduto() {
+    alert("Filtrar produto: Ainda não implementado");
+  }
+}
