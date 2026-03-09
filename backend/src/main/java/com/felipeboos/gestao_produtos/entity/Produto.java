@@ -22,7 +22,7 @@ public class Produto extends EntidadeBase {
     private String descricao;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoria_id")
+    @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
     @Column(name = "precoCusto")

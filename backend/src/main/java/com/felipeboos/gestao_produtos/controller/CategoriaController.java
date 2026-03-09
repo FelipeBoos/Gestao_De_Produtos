@@ -50,8 +50,12 @@ public class CategoriaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarPorId(@PathVariable Long id) {
-        categoriaService.deletarCategoriaPorId(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deletarPorId(@PathVariable Long id) {
+        try {
+            categoriaService.deletarCategoriaPorId(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

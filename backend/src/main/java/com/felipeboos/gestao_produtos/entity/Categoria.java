@@ -25,6 +25,6 @@ public class Categoria extends EntidadeBase{
     @Column(name = "descricao")
     private String descricao;
 
-    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "categoria")
     private List<Produto> produtos = new ArrayList<>();
 }

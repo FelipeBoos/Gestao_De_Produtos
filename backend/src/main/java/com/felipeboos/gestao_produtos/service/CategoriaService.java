@@ -5,6 +5,7 @@ import com.felipeboos.gestao_produtos.dto.categoria.CategoriaResponseDTO;
 import com.felipeboos.gestao_produtos.dto.categoria.CategoriaUpdateDTO;
 import com.felipeboos.gestao_produtos.entity.Categoria;
 import com.felipeboos.gestao_produtos.repository.CategoriaRepository;
+import com.felipeboos.gestao_produtos.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,9 +15,11 @@ import java.util.ArrayList;
 public class CategoriaService {
 
     private final CategoriaRepository repository;
+    private final ProdutoRepository produtoRepository;
 
-    public CategoriaService(CategoriaRepository repository) {
+    public CategoriaService(CategoriaRepository repository, ProdutoRepository produtoRepository) {
         this.repository = repository;
+        this.produtoRepository = produtoRepository;
     }
 
     public CategoriaResponseDTO salvarCategoria(CategoriaRequestDTO dto) {
@@ -59,6 +62,12 @@ public class CategoriaService {
     }
 
     public void deletarCategoriaPorId(Long id) {
+        if (produtoRepository.existsByCategoriaId(id)) {
+            throw new IllegalStateException(
+                    "Não eh possivel excluir uma categoria se ja existe um produto vinculado a ela"
+            );
+        }
+
         repository.deleteById(id);
     }
 
