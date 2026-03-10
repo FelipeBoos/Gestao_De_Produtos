@@ -96,8 +96,28 @@ export class Produtos implements OnInit {
     this.produtoEmEdicaoId = id;
   }
 
-  deletarProduto(id: number) {
-    alert(`Deletar produto: Ainda não implementado. Id selecionado: ${id}`);
+  deletarProduto(id: number): void {
+    if (!confirm('Deseja realmente excluir este produto?')){
+      return;
+    }
+
+    this.produtoService.deletarProduto(id).subscribe({
+      next: () => {
+        console.log('Produto deletado: ', id);
+        alert('Produto deletado com sucesso');
+        this.carregarProdutos();
+      },
+      error: (erro: HttpErrorResponse) => {
+        console.error('Erro ao excluir produto:', erro);
+
+        if (erro.status === 404) {
+          alert('Produto não encontrado');
+          return;
+        }
+
+        alert('Ocorreu um erro ao excluir o produto');
+      }
+    });
   }
 
   resetarFormulario() {

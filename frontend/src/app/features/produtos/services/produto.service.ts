@@ -40,4 +40,8 @@ export class ProdutoService {
     return this.http.post<ProdutoResponse>(this.apiUrl, produto);
   }
 
+
+  deletarProduto(id: number) {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`)
+  }
 }
