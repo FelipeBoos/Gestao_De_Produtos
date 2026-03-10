@@ -128,6 +128,7 @@ export class Categorias implements OnInit {
 
     this.nome = categoria.nome;
     this.descricao = categoria.descricao;
+    
     this.exibirFormulario = true;
     this.categoriaEmEdicaoId = id;
   }

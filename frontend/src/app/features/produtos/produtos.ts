@@ -77,7 +77,16 @@ export class Produtos implements OnInit {
           }
         })
     } else {
-
+      //atualizarProduto()
+      this.produtoService
+        .atualizarProduto(this.produtoEmEdicaoId, produto)
+        .subscribe({
+          next: () => {
+            alert('Produto atualizado com sucesso');
+            this.resetarFormulario();
+            this.carregarProdutos();  
+          }
+        })
     }
   }
 
@@ -91,7 +100,19 @@ export class Produtos implements OnInit {
   }
 
   editarProduto(id: number) {
-    alert(`Editar produto: Ainda não implementado. Id selecionado: ${id}`);
+    const produto = this.produtos().find((p: ProdutoResponse) => p.id === id);
+
+    if (!produto) {
+      return;
+    }
+
+    this.nome = produto.nome;
+    this.descricao = produto.descricao;
+    this.categoriaId = produto.categoriaId;
+    this.precoCusto = produto.precoCusto;
+    this.precoVenda = produto.precoVenda;
+    this.quantidadeEstoque = produto.quantidadeEstoque;
+
     this.exibirFormulario = true;
     this.produtoEmEdicaoId = id;
   }

@@ -50,7 +50,7 @@ public class ProdutoService {
     }
 
     public List<ProdutoResponseDTO> listarTodosOsProdutos() {
-        List<Produto> listaProdutos = repository.findAll();
+        List<Produto> listaProdutos = repository.findAllByOrderByIdAsc();
 
         List<ProdutoResponseDTO> listaProdutosResponse = new ArrayList<>();
 

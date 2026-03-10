@@ -40,6 +40,9 @@ export class ProdutoService {
     return this.http.post<ProdutoResponse>(this.apiUrl, produto);
   }
 
+  atualizarProduto(id: number, produto: ProdutoRequest) {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, produto)
+  }
 
   deletarProduto(id: number) {
     return this.http.delete<void>(`${this.apiUrl}/${id}`)
