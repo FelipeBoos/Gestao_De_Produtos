@@ -8,7 +8,7 @@ import { CategoriaResponse, CategoriaService } from './services/categoria.servic
   standalone: true,
   imports: [FormsModule],
   templateUrl: './categorias.html',
-  styleUrl: './categorias.css',
+  styleUrls: ['./categorias.css'],
 })
 export class Categorias implements OnInit {
   nome = '';

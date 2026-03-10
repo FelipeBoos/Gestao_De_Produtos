@@ -2,6 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
 import { CategoriaResponse } from '../../categorias/services/categoria.service';
 
+export interface ProdutoRequest {
+  nome: string,
+  descricao: string,
+  categoriaId: number,
+  precoCusto: number,
+  precoVenda: number,
+  quantidadeEstoque: number
+}
+
 export interface ProdutoResponse {
   id: number,
   nome: string,
@@ -25,6 +34,10 @@ export class ProdutoService {
 
   listarProdutos() {
     return this.http.get<ProdutoResponse[]>(this.apiUrl);
+  }
+
+  cadastrarProduto(produto: ProdutoRequest) {
+    return this.http.post<ProdutoResponse>(this.apiUrl, produto);
   }
 
 }

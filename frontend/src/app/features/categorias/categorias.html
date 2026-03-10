@@ -9,26 +9,26 @@
     <hr />
 
     @if (exibirFormulario) {
-    <h2>
-        {{ categoriaEmEdicaoId === null ? 'Nova Categoria' : 'Editar Categoria'}}
-    </h2>
-    <form (ngSubmit)="salvarCategoria()">
-        <div>
-            <label for="nome">Nome</label>
-            <input id="nome" type="text" [(ngModel)]="nome" name="nome">
-        </div>
+        <h2>
+            {{ categoriaEmEdicaoId === null ? 'Nova Categoria' : 'Editar Categoria'}}
+        </h2>
+        <form (ngSubmit)="salvarCategoria()">
+            <div>
+                <label for="nome">Nome</label>
+                <input id="nome" type="text" [(ngModel)]="nome" name="nome">
+            </div>
 
-        <div>
-            <label for="descricao">Descrição</label>
-            <input id="descricao" type="text" [(ngModel)]="descricao" name="descricao">
-        </div>
+            <div>
+                <label for="descricao">Descrição</label>
+                <input id="descricao" type="text" [(ngModel)]="descricao" name="descricao">
+            </div>
 
-        <button type="submit">
-            {{ categoriaEmEdicaoId === null ? 'Salvar' : 'Atualizar'}}
-        </button>
-        <button type="button" (click)="resetarFormulario()">Cancelar</button>
-    </form>
-    <hr>
+            <button type="submit">
+                {{ categoriaEmEdicaoId === null ? 'Salvar' : 'Atualizar'}}
+            </button>
+            <button type="button" (click)="resetarFormulario()">Cancelar</button>
+        </form>
+        <hr>
     }
 
     <h2>Categorias cadastradas</h2>
