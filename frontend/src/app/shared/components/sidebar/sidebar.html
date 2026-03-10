@@ -4,16 +4,19 @@
     </div>
 
     <nav>
-        <a routerLink="/app/produtos">
+        <a routerLink="/app/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <span>Home</span>
+        </a>
+        <a routerLink="/app/produtos" routerLinkActive="active">
             <span>Produtos</span>
         </a>
-        <a routerLink="/app/categorias">
+        <a routerLink="/app/categorias" routerLinkActive="active">
             <span>Categorias</span>
         </a>
-        <a routerLink="/app/pedidos">
+        <a routerLink="/app/pedidos" routerLinkActive="active">
             <span>Pedidos</span>
         </a>
-        <a routerLink="/app/usuarios">
+        <a routerLink="/app/usuarios" routerLinkActive="active">
             <span>Usuários</span>
         </a>
     </nav>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterModule } from '@angular/router';
 
 interface MenuItem {
   label: string;
@@ -7,7 +7,7 @@ interface MenuItem {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink],
+  imports: [RouterLink, RouterModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
