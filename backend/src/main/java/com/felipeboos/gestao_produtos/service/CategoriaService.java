@@ -64,7 +64,7 @@ public class CategoriaService {
     public void deletarCategoriaPorId(Long id) {
         if (produtoRepository.existsByCategoriaId(id)) {
             throw new IllegalStateException(
-                    "Não eh possivel excluir uma categoria se ja existe um produto vinculado a ela"
+                    "Nao eh possivel excluir uma categoria se ja existe um produto vinculado a ela"
             );
         }
 
