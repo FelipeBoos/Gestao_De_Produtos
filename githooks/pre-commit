@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo "Rodando testes antes do commit..."
+
+cd backend || exit 1
+
+mvn test
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+  echo "Os testes falharam. Commit cancelado."
+  exit 1
+fi
+
+echo "Testes passaram. Prosseguindo com o commit."
+exit 0
