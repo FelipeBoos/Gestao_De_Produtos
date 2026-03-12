@@ -8,6 +8,7 @@ import com.felipeboos.gestao_produtos.entity.Produto;
 import com.felipeboos.gestao_produtos.repository.CategoriaRepository;
 import com.felipeboos.gestao_produtos.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class ProdutoService {
         return List.of(ProdutoResponseDTO.fromEntity(produto));
     }
 
+    @Transactional(readOnly = true)
     public List<ProdutoResponseDTO> listarTodosOsProdutos() {
         List<Produto> listaProdutos = repository.findAllByOrderByIdAsc();
 

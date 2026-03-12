@@ -25,12 +25,12 @@ public class Produto extends EntidadeBase {
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
-    @Column(name = "precoCusto")
+    @Column(name = "preco_custo")
     private BigDecimal precoCusto;
 
-    @Column(name = "precoVenda")
+    @Column(name = "preco_venda")
     private BigDecimal precoVenda;
 
-    @Column(name = "quantidadeEstoque")
+    @Column(name = "quantidade_estoque")
     private Integer quantidadeEstoque;
 }
