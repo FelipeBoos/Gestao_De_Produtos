@@ -119,7 +119,7 @@ public class ProdutoService {
 
     private void setCategoria(Produto produtoEntity, Long categoriaId) {
         Categoria categoria = catRepository.findById(categoriaId).orElseThrow(
-                () -> new RuntimeException("CategoriaNão encontrada")
+                () -> new RuntimeException("Categoria nao encontrada")
         );
 
         produtoEntity.setCategoria(categoria);
