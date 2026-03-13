@@ -1,4 +1,4 @@
-package com.felipeboos.gestao_produtos.dto.estrategiaPreco;
+package com.felipeboos.gestao_produtos.dto.estrategiapreco;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
