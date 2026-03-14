@@ -71,6 +71,18 @@ public class EstrategiaPrecoService {
         return EstrategiaPrecoResponseDTO.fromEntity(estrategiaPreco);
     }
 
+    @Transactional(readOnly = true)
+    public List<EstrategiaPrecoResponseDTO> buscarEstrategiaPorProdutoId(Long id) {
+        List<EstrategiaPreco> listaEstrategiasEntidade = estrategiaPrecoRepository.findByProduto_Id(id);
+        List<EstrategiaPrecoResponseDTO> listaEstrategiasResponse = new ArrayList<>();
+
+        for (EstrategiaPreco entidade : listaEstrategiasEntidade) {
+            listaEstrategiasResponse.add(EstrategiaPrecoResponseDTO.fromEntity(entidade));
+        }
+
+        return listaEstrategiasResponse;
+    }
+
     private EstrategiaPreco calcularEstrategiaPreco(EstrategiaPrecoRequestDTO request, Produto produto) {
 
         BigDecimal precoSugerido = calcularPrecoSugerido(

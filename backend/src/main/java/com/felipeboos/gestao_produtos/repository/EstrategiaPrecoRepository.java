@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface EstrategiaPrecoRepository extends JpaRepository<EstrategiaPreco, Long> {
     List<EstrategiaPreco> findAllByOrderByIdAsc();
+
+    List<EstrategiaPreco> findByProduto_Id(Long id);
 }
