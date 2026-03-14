@@ -17,6 +17,11 @@ public class EstrategiaPrecoController {
 
     private final EstrategiaPrecoService service;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<EstrategiaPrecoResponseDTO> buscarEstrategiaPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.buscarEstrategiaPorId(id));
+    }
+
     @GetMapping
     public ResponseEntity<List<EstrategiaPrecoResponseDTO>> listarTodas() {
         return ResponseEntity.ok(service.listarTodasAsEstrategiasDePreco());

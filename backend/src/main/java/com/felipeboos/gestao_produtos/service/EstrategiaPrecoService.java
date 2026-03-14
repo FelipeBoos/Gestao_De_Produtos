@@ -62,6 +62,15 @@ public class EstrategiaPrecoService {
         return listaEstrategiasResponse;
     }
 
+    @Transactional(readOnly = true)
+    public EstrategiaPrecoResponseDTO buscarEstrategiaPorId(Long id) {
+        EstrategiaPreco estrategiaPreco = estrategiaPrecoRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Estrategia de preco nao encontrada")
+        );
+
+        return EstrategiaPrecoResponseDTO.fromEntity(estrategiaPreco);
+    }
+
     private EstrategiaPreco calcularEstrategiaPreco(EstrategiaPrecoRequestDTO request, Produto produto) {
 
         BigDecimal precoSugerido = calcularPrecoSugerido(
