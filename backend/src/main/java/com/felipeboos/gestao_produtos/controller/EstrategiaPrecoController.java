@@ -17,6 +17,11 @@ public class EstrategiaPrecoController {
 
     private final EstrategiaPrecoService service;
 
+    @GetMapping
+    public ResponseEntity<List<EstrategiaPrecoResponseDTO>> listarTodas() {
+        return ResponseEntity.ok(service.listarTodasAsEstrategiasDePreco());
+    }
+
     @PostMapping("/simular")
     public ResponseEntity<EstrategiaPrecoResponseDTO> simularEstrategiaPreco(
             @RequestBody @Valid EstrategiaPrecoRequestDTO request) {

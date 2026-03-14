@@ -6,11 +6,13 @@ import com.felipeboos.gestao_produtos.entity.EstrategiaPreco;
 import com.felipeboos.gestao_produtos.entity.Produto;
 import com.felipeboos.gestao_produtos.repository.EstrategiaPrecoRepository;
 import com.felipeboos.gestao_produtos.repository.ProdutoRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -46,6 +48,18 @@ public class EstrategiaPrecoService {
         EstrategiaPreco estrategiaSalva = estrategiaPrecoRepository.saveAndFlush(estrategia);
 
         return EstrategiaPrecoResponseDTO.fromEntity(estrategiaSalva);
+    }
+
+    @Transactional(readOnly = true)
+    public List<EstrategiaPrecoResponseDTO> listarTodasAsEstrategiasDePreco() {
+        List<EstrategiaPreco> listaEstrategiasEntidade = estrategiaPrecoRepository.findAllByOrderByIdAsc();
+        List<EstrategiaPrecoResponseDTO> listaEstrategiasResponse = new ArrayList<>();
+
+        for (EstrategiaPreco entidade : listaEstrategiasEntidade) {
+            listaEstrategiasResponse.add(EstrategiaPrecoResponseDTO.fromEntity(entidade));
+        }
+
+        return listaEstrategiasResponse;
     }
 
     private EstrategiaPreco calcularEstrategiaPreco(EstrategiaPrecoRequestDTO request, Produto produto) {
