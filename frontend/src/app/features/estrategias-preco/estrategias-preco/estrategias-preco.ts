@@ -12,6 +12,10 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrl: './estrategias-preco.css',
 })
 export class EstrategiasPreco implements OnInit {
+  produtoId: number | null = null;
+  margemLucro: number | null = null;
+  percentualImposto: number | null = null;
+
   exibirFormulario = false;
   estrategiasPreco = signal<EstrategiaPrecoResponse[]>([]);
 
@@ -67,14 +71,23 @@ export class EstrategiasPreco implements OnInit {
     })
   }
 
-  testarSimulacao() {
-    const request = {
-      produtoId: 8,
-      margemLucro: 0.2,
-      percentualImposto: 0.1
+  simularEstrategiaDePreco() {
+    if (
+      this.produtoId === null ||
+      this.margemLucro === null ||
+      this.percentualImposto === null
+    ) {
+      alert('Preencha todos os campos');
+      return;
+    }
+
+    const estrategiaPreco = {
+      produtoId: this.produtoId,
+      margemLucro: this.margemLucro,
+      percentualImposto: this.percentualImposto,
     };
 
-    this.estrategiaPrecoService.simularEstrategiaPreco(request).subscribe({
+    this.estrategiaPrecoService.simularEstrategiaPreco(estrategiaPreco).subscribe({
       next: (resposta) => {
         console.log('Resultado da simulação: ', resposta);
       },
