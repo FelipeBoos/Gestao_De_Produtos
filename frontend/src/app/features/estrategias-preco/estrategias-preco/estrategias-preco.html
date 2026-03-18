@@ -13,18 +13,18 @@
     <p>Nenhuma Estratégia de Preço cadastrada.</p>
 </section>
 
-@if (mostrarModalSimulacao) {
-    <div class="overlay" (click)="fecharSimulacao()">
-        <div class="modal-simulacao" (click)="$event.stopPropagation()">
-            <h2>Simular Estratégia de Preço</h2>
 
-            <p>Formulário de simulação</p>
+<app-modal [aberto]="exibirFormulario" [titulo]="'Simular Estratégia de Preço'" (fechar)="resetarFormulario()">
 
             <form action="">
                 <div>
                     <label for="produto">Produto</label>
                     <select name="" id="">
                         <option >Selecione um produto</option>
+
+                        @for (produto of produtos(); track produto.id) {
+                            <option [ngValue]="produto.id"> {{ produto.nome }}</option>
+                        }
                     </select>
                 </div>
 
@@ -39,10 +39,9 @@
                 </div>
             </form>
 
-            <div class="modal-actions">
-                <button class="btn btn-primary">Simular</button>
-                <button class="btn btn-secondary" (click)="fecharSimulacao()">Cancelar</button>
-            </div>
-        </div>
+    <div class="modal-actions">
+        <button class="btn btn-primary" (click)="testarSimulacao()">Simular</button>
+        <button class="btn btn-secondary" (click)="fecharSimulacao()">Cancelar</button>
     </div>
-}
+
+</app-modal>
