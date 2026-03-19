@@ -14,12 +14,12 @@
 </section>
 
 
-<app-modal [aberto]="exibirFormulario" [titulo]="'Simular Estratégia de Preço'" (fechar)="resetarFormulario()">
+<app-modal [aberto]="exibirFormulario" [titulo]="'Simular Estratégia de Preço'" (fechar)="fecharSimulacao()">
 
             <form (ngSubmit)="simularEstrategiaDePreco()">
                 <div>
                     <label for="produto">Produto</label>
-                    <select name="produtoId" [(ngModel)]="produtoId" id="produtoId" requrired>
+                    <select name="produtoId" [(ngModel)]="produtoId" id="produtoId" required>
                         <option [ngValue]="null">Selecione um produto</option>
 
                         @for (produto of produtos(); track produto.id) {
@@ -39,9 +39,47 @@
                 </div>
 
                 <div class="modal-actions">
-                    <button class="btn btn-primary" type="submit">Simular</button>
-                    <button class="btn btn-secondary" (click)="fecharSimulacao()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Simular</button>
+                    <button type="button" class="btn btn-secondary" (click)="fecharSimulacao()">Cancelar</button>
                 </div>
             </form>
+
+    @if (resultadoSimulacao; as resultado) {
+        <hr>
+        <section class="resultado-simulacao">
+
+            <div class="resultado-header">
+                <h3>Resultado da simulação</h3>
+                <p>Montei a seguinte estratégia com base no produto selecionado e nos valores informados</p>
+            </div>
+
+            <div class="resultado-grid">
+
+                <div class="result-card">
+                    <span>Produto</span>
+                    <strong>{{ resultado.produtoNome }}</strong>
+                </div>
+
+                <div class="result-card destaque">
+                    <span>Preço sugerido</span>
+                    <strong>{{ resultado.precoSugerido | currency:'BRL' }}</strong>
+                </div>
+
+                <div class="result-card">
+                    <span>Demanda estimada</span>
+                    <strong>
+                        {{ resultado.demandaEstimada }}
+                        {{ resultado.demandaEstimada > 1 ? ' unidades' : ' unidade' }}
+                    </strong>
+                </div>
+
+                <div class="result-card destaque">
+                    <span>Lucro total estimado</span>
+                    <strong>{{ resultado.lucroTotalEstimado | currency:'BRL' }}</strong>
+                </div>
+            </div>
+
+        </section>
+    }
 
 </app-modal>
