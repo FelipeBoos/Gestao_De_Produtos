@@ -43,3 +43,14 @@
 .modal-content {
     display: block;
 }
+
+@media (max-height: 700px) {
+    .overlay {
+        padding: 16px;
+    }
+
+    .modal-box {
+        max-height: calc(100vh - 32px);
+        padding: 20px 24px;
+    }
+}

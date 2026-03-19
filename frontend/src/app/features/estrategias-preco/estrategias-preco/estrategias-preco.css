@@ -2,33 +2,22 @@
     position: fixed;
     top: 0;
     left: 0;
-
     width: 100vw;
     height: 100vh;
-
-    background: rgba(0, 0, 0,0.45);
-
+    background: rgba(0, 0, 0, 0.45);
     display: flex;
     justify-content: center;
     align-items: center;
-
     z-index: 1000;
 }
 
 .modal-simulacao {
-    background: white;
+    background: #ffffff;
     padding: 30px;
-    width: 500px;
-
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
-
-.modal-actions {
-    margin-top: 20px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    width: 700px;
+    max-width: 95vw;
+    border-radius: 16px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
 }
 
 form {
@@ -37,7 +26,7 @@ form {
     gap: 18px;
 }
 
-form div {
+form > div {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -56,23 +45,157 @@ textarea {
     min-height: 42px;
     padding: 10px 12px;
     border: 1px solid #d1d5db;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
     outline: none;
     box-sizing: border-box;
     background: #fff;
+    transition: all 0.2s ease;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
     border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
 .modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    margin-top: 8px;
+    margin-top: 10px;
+}
+
+.resultado-simulacao {
+    margin-top: 20px;
+}
+/*
+.card {
+    background: #ffffff;
+    border: 3px solid #11cb56;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(8, 8, 8, 0.06);
+}
+    */
+
+.card {
+    border: 2px solid #22c55e;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(8, 8, 8, 0.06);
+}
+
+.card-header {
+    padding: 22px 20px;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    text-align: center;
+    color: rgb(230, 228, 228);
+}
+
+.card-header.verde {
+    background: linear-gradient(135deg, #15b34f, #16a249);
+}
+
+.resultado-linhas {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;                  /* linhas horizontais mais finas */
+    padding: 8px;              /* cria linhas laterais e linha abaixo do header */
+    background: #d4d5d5;       /* cor das linhas */
+}
+
+.linha {
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+}
+
+.linha-2-colunas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;                  /* linha vertical central fina */
+    background: transparent;
+}
+
+.bloco-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 22px;
+    background: #ffffff;
+    border-radius: 8px;
+
+    border: 1px solid #97999b;
+}
+
+.bloco-info span {
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    color: #64748b;
+}
+
+.bloco-info strong {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.linha-centralizada .bloco-centro {
+    align-items: center;
+    text-align: center;
+}
+
+.linha-centralizada .bloco-centro strong {
+    font-size: 20px;
+}
+
+.linha-lucro-total {
+    border: 2px solid #10d35b;
+    background: transparent;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-lucro-total {
+    padding: 24px 20px;
+    text-align: center;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #a4d4ae, #c7f0d3);
+}
+
+.card-lucro-total span {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #166534;
+}
+
+.card-lucro-total strong {
+    font-size: 30px;
+    font-weight: 800;
+    color: #15803d;
+    line-height: 1.1;
+}
+
+@media (max-width: 640px) {
+    .modal-simulacao {
+        width: 95vw;
+        padding: 20px;
+    }
+
+    .linha-2-colunas {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .card-lucro-total strong {
+        font-size: 26px;
+    }
 }

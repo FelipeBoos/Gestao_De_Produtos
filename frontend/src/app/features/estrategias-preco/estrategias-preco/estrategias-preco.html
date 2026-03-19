@@ -9,77 +9,110 @@
     <hr>
 
     <h2>Estratégias de Preço cadastradas</h2>
-
     <p>Nenhuma Estratégia de Preço cadastrada.</p>
 </section>
 
-
 <app-modal [aberto]="exibirFormulario" [titulo]="'Simular Estratégia de Preço'" (fechar)="fecharSimulacao()">
+    <form (ngSubmit)="simularEstrategiaDePreco()">
 
-            <form (ngSubmit)="simularEstrategiaDePreco()">
-                <div>
-                    <label for="produto">Produto</label>
-                    <select name="produtoId" [(ngModel)]="produtoId" id="produtoId" required>
-                        <option [ngValue]="null">Selecione um produto</option>
+        <div>
+            <label for="produto">Produto</label>
+            <select name="produtoId" [(ngModel)]="produtoId" id="produtoId" required>
+                <option [ngValue]="null">Selecione um produto</option>
 
-                        @for (produto of produtos(); track produto.id) {
-                            <option [ngValue]="produto.id"> {{ produto.nome }}</option>
-                        }
-                    </select>
+                @for (produto of produtos(); track produto.id) {
+                    <option [ngValue]="produto.id">{{ produto.nome }}</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label for="margemLucro">Margem de lucro</label>
+            <input
+                id="margemLucro"
+                type="number"
+                step="0.01"
+                min="0"
+                [(ngModel)]="margemLucro"
+                name="margemLucro"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="percentualImposto">Percentual de imposto</label>
+            <input
+                id="percentualImposto"
+                type="number"
+                step="0.01"
+                min="0"
+                [(ngModel)]="percentualImposto"
+                name="percentualImposto"
+                required
+            >
+        </div>
+
+        @if (resultadoSimulacao; as resultado) {
+            <section class="resultado-simulacao">
+                <div class="card card-resultado">
+                    <div class="card-header verde">
+                        Estratégia de preço - {{ resultado.produtoNome }}
+                    </div>
+
+                    <div class="resultado-linhas">
+                        <div class="linha linha-2-colunas">
+                            <div class="bloco-info">
+                                <span>Preço sugerido</span>
+                                <strong>{{ resultado.precoSugerido | currency:'BRL' }}</strong>
+                            </div>
+
+                            <div class="bloco-info">
+                                <span>Demanda estimada</span>
+                                <strong>
+                                    {{ resultado.demandaEstimada }}
+                                    {{ resultado.demandaEstimada > 1 ? ' unidades' : ' unidade' }}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="linha linha-2-colunas">
+                            <div class="bloco-info">
+                                <span>Imposto unitário</span>
+                                <strong>-</strong>
+                            </div>
+
+                            <div class="bloco-info">
+                                <span>Imposto total</span>
+                                <strong>-</strong>
+                            </div>
+                        </div>
+
+                        <div class="linha linha-centralizada">
+                            <div class="bloco-info bloco-centro">
+                                <span>Lucro unitário</span>
+                                <strong>{{ resultado.lucroUnitario | currency:'BRL' }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="linha linha-lucro-total">
+                            <div class="card-lucro-total">
+                                <span>Lucro total</span>
+                                <strong>{{ resultado.lucroTotalEstimado | currency:'BRL' }}</strong>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </section>
+        }
 
-                <div>
-                    <label for="margemLucro">Margem de lucro</label>
-                    <input id="margemLucro" type="number"  step="0.01" min="0" [(ngModel)]="margemLucro" name="margemLucro" required>
-                </div>
+        <div class="modal-actions">
+            <button type="submit" class="btn btn-primary">
+                {{ resultadoSimulacao ? 'Simular novamente' : 'Simular' }}
+            </button>
 
-                <div>
-                    <label for="percentualImposto">Percentual de imposto</label>
-                    <input id="percentualImposto" type="number"  step="0.01" min="0" [(ngModel)]="percentualImposto" name="percentualImposto" required>
-                </div>
-
-                <div class="modal-actions">
-                    <button type="submit" class="btn btn-primary">Simular</button>
-                    <button type="button" class="btn btn-secondary" (click)="fecharSimulacao()">Cancelar</button>
-                </div>
-            </form>
-
-    @if (resultadoSimulacao; as resultado) {
-        <hr>
-        <section class="resultado-simulacao">
-
-            <div class="resultado-header">
-                <h3>Resultado da simulação</h3>
-                <p>Montei a seguinte estratégia com base no produto selecionado e nos valores informados</p>
-            </div>
-
-            <div class="resultado-grid">
-
-                <div class="result-card">
-                    <span>Produto</span>
-                    <strong>{{ resultado.produtoNome }}</strong>
-                </div>
-
-                <div class="result-card destaque">
-                    <span>Preço sugerido</span>
-                    <strong>{{ resultado.precoSugerido | currency:'BRL' }}</strong>
-                </div>
-
-                <div class="result-card">
-                    <span>Demanda estimada</span>
-                    <strong>
-                        {{ resultado.demandaEstimada }}
-                        {{ resultado.demandaEstimada > 1 ? ' unidades' : ' unidade' }}
-                    </strong>
-                </div>
-
-                <div class="result-card destaque">
-                    <span>Lucro total estimado</span>
-                    <strong>{{ resultado.lucroTotalEstimado | currency:'BRL' }}</strong>
-                </div>
-            </div>
-
-        </section>
-    }
-
+            <button type="button" class="btn btn-secondary" (click)="fecharSimulacao()">
+                Cancelar
+            </button>
+        </div>
+    </form>
 </app-modal>
