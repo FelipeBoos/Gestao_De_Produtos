@@ -1,0 +1,194 @@
+<section class="page simulacao-page">
+
+    <div class="header-simulacao">
+        <button type="button" class="btn-voltar" (click)="voltar()">
+            ← Voltar
+        </button>
+
+        <h1>Simular Estratégia de Preço</h1>
+    </div>
+
+    <div class="simulacao-layout">
+
+        <div class="coluna-esquerda">
+            <section class="coluna-formulario">
+                <form (ngSubmit)="simularEstrategiaDePreco()">
+
+                    <div>
+                        <label for="produtoId">Produto</label>
+                        <select name="produtoId" [(ngModel)]="produtoId" id="produtoId" required>
+                            <option [ngValue]="null">Selecione um produto</option>
+                            @for (produto of produtos(); track produto.id) {
+                                <option [ngValue]="produto.id">{{ produto.nome }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="margemLucro">Margem de lucro</label>
+                        <input
+                            id="margemLucro"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            [(ngModel)]="margemLucro"
+                            name="margemLucro"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="percentualImposto">Percentual de imposto</label>
+                        <input
+                            id="percentualImposto"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            [(ngModel)]="percentualImposto"
+                            name="percentualImposto"
+                            required
+                        >
+                    </div>
+
+                    <div class="acoes-formulario">
+                        <button type="submit" class="btn btn-primary">
+                            {{ resultadoSimulacao ? 'Simular novamente' : 'Simular' }}
+                        </button>
+
+                        <button type="button" class="btn btn-secondary" (click)="cancelar()">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="coluna-produto">
+                @if (resultadoSimulacao; as resultado) {
+                    <section class="resultado-simulacao">
+                        <div class="resultado-titulo">
+                            <p>Resultado da simulação:</p>
+                        </div>
+
+                        <div class="card card-dados-produto">
+                            <div class="card-header azul">
+                                Dados do produto
+                            </div>
+
+                            <div class="resultado-linhas">
+                                <div class="linha linha-2-colunas">
+                                    <div class="bloco-info">
+                                        <span>Nome</span>
+                                        <strong>{{ resultado.produtoNome }}</strong>
+                                    </div>
+
+                                    <div class="bloco-info">
+                                        <span>Categoria</span>
+                                        <strong>* Fazer *</strong>
+                                    </div>
+                                </div>
+
+                                <div class="linha linha-2-colunas">
+                                    <div class="bloco-info">
+                                        <span>Preço unidade</span>
+                                        <strong>R$ * fazer *</strong>
+                                    </div>
+
+                                    <div class="bloco-info">
+                                        <span>Demanda base</span>
+                                        <strong>* fazer *</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                } @else {
+                    <section class="resultado-vazio resultado-vazio-menor">
+                        <p>Os dados do produto aparecerão aqui após a simulação.</p>
+                    </section>
+                }
+            </section>
+        </div>
+
+        <section class="coluna-resultado">
+            @if (resultadoSimulacao; as resultado) {
+                <section class="resultado-simulacao">
+
+                    <div class="resultado-info">
+                        <p>
+                            Margem de lucro: {{ margemLucro }}% - percentual de imposto: {{ percentualImposto }}%
+                        </p>
+
+                        <p>
+                            Com base nos dados informados, gerei a seguinte estratégia de preço:
+                        </p>
+                    </div>
+
+                    <div class="card card-resultado card-resultado-principal">
+                        <div class="card-header verde">
+                            Estratégia de preço - {{ resultado.produtoNome }}
+                        </div>
+
+                        <div class="resultado-linhas">
+                            <div class="linha linha-2-colunas">
+                                <div class="bloco-info">
+                                    <span>Preço sugerido</span>
+                                    <strong>{{ resultado.precoSugerido | currency:'BRL' }}</strong>
+                                </div>
+
+                                <div class="bloco-info">
+                                    <span>Demanda estimada</span>
+                                    <strong>
+                                        {{ resultado.demandaEstimada }}
+                                        {{ resultado.demandaEstimada > 1 ? ' unidades' : ' unidade' }}
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div class="linha linha-2-colunas">
+                                <div class="bloco-info">
+                                    <span>Imposto unitário</span>
+                                    <strong>-</strong>
+                                </div>
+
+                                <div class="bloco-info">
+                                    <span>Imposto total</span>
+                                    <strong>-</strong>
+                                </div>
+                            </div>
+
+                            <div class="linha linha-centralizada">
+                                <div class="bloco-info bloco-centro">
+                                    <span>Lucro unitário</span>
+                                    <strong>{{ resultado.lucroUnitario | currency:'BRL' }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="linha linha-lucro-total">
+                                <div class="card-lucro-total">
+                                    <span>Lucro total</span>
+                                    <strong>{{ resultado.lucroTotalEstimado | currency:'BRL' }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="acoes-resultado">
+                        <button
+                            type="button"
+                            class="btn-success"
+                            (click)="salvarEstrategia()"
+                        >
+                            Salvar estratégia
+                        </button>
+                    </div>
+                </section>
+            } @else {
+                <section class="resultado-vazio resultado-vazio-principal">
+                    <p>Preencha os campos da simulação para visualizar a estratégia de preço aqui.</p>
+                </section>
+            }
+        </section>
+
+    </div>
+
+</section>

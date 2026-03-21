@@ -6,7 +6,9 @@ import { Categorias } from './features/categorias/categorias';
 import { Pedidos } from './features/pedidos/pedidos';
 import { Usuarios } from './features/usuarios/usuarios';
 import { Login } from './features/login/login';
-import { EstrategiasPreco } from './features/estrategias-preco/estrategias-preco/estrategias-preco';
+import { EstrategiasPreco } from './features/estrategias-preco/estrategias-preco';
+
+import { SimularEstrategiaPreco } from './features/estrategias-preco/simular-estrategia-preco/simular-estrategia-preco';
 
 export const routes: Routes = [
     {
@@ -38,6 +40,11 @@ export const routes: Routes = [
                 component: EstrategiasPreco
             },
             {
+                path: 'estrategias-preco/simular',
+                component: SimularEstrategiaPreco
+            },
+
+            {
                 path: 'produtos',
                 component: Produtos
             },
@@ -55,5 +62,4 @@ export const routes: Routes = [
             },
         ]
     }
-
 ];
