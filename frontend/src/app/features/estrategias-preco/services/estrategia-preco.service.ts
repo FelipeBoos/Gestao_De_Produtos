@@ -10,14 +10,22 @@ export interface EstrategiaPrecoRequest {
 
 export interface EstrategiaPrecoResponse {
   id: number;
+
   produtoId: number;
   produtoNome: string;
+  categoriaNome: string;
+  precoUnidade: number;
+  demandaBase: number;
+
   margemLucro: number;
   percentualImposto: number;
+  
   precoSugerido: number;
-  lucroUnitario: number;
   demandaEstimada: number;
-  lucroTotalEstimado: number;
+  impostoUnitario: number;  
+  impostoTotal: number;
+  lucroUnitario: number;
+  lucroTotalEstimado: number; 
 }
 
 @Injectable({

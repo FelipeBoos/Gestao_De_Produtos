@@ -6,8 +6,8 @@ import com.felipeboos.gestao_produtos.entity.EstrategiaPreco;
 import com.felipeboos.gestao_produtos.entity.Produto;
 import com.felipeboos.gestao_produtos.repository.EstrategiaPrecoRepository;
 import com.felipeboos.gestao_produtos.repository.ProdutoRepository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,36 +18,39 @@ import java.util.List;
 @Service
 public class EstrategiaPrecoService {
 
+    private static final int SCALE_MONETARIO = 2;
+    private static final int SCALE_PERCENTUAL = 4;
+
     private final ProdutoRepository produtoRepository;
     private final EstrategiaPrecoRepository estrategiaPrecoRepository;
 
     public EstrategiaPrecoService(
-            ProdutoRepository produtoRepository, EstrategiaPrecoRepository estrategiaPrecoRepository
+            ProdutoRepository produtoRepository,
+            EstrategiaPrecoRepository estrategiaPrecoRepository
     ) {
         this.produtoRepository = produtoRepository;
         this.estrategiaPrecoRepository = estrategiaPrecoRepository;
     }
 
+    @Transactional(readOnly = true)
     public EstrategiaPrecoResponseDTO simularPreco(EstrategiaPrecoRequestDTO request) {
-        Produto produto = produtoRepository.findById(request.getProdutoId()).orElseThrow(
-                () -> new RuntimeException("Produto nao encontrado")
-        );
+        Produto produto = produtoRepository.findById(request.getProdutoId())
+                .orElseThrow(() -> new RuntimeException("Produto nao encontrado"));
 
         EstrategiaPreco estrategia = calcularEstrategiaPreco(request, produto);
 
-        return EstrategiaPrecoResponseDTO.fromEntity(estrategia);
+        return toResponseDTO(estrategia);
     }
 
+    @Transactional
     public EstrategiaPrecoResponseDTO criarEstrategiaPreco(EstrategiaPrecoRequestDTO request) {
-        Produto produto = produtoRepository.findById(request.getProdutoId()).orElseThrow(
-                () -> new RuntimeException("Produto nao encontrado")
-        );
+        Produto produto = produtoRepository.findById(request.getProdutoId())
+                .orElseThrow(() -> new RuntimeException("Produto nao encontrado"));
 
         EstrategiaPreco estrategia = calcularEstrategiaPreco(request, produto);
-
         EstrategiaPreco estrategiaSalva = estrategiaPrecoRepository.saveAndFlush(estrategia);
 
-        return EstrategiaPrecoResponseDTO.fromEntity(estrategiaSalva);
+        return toResponseDTO(estrategiaSalva);
     }
 
     @Transactional(readOnly = true)
@@ -56,7 +59,7 @@ public class EstrategiaPrecoService {
         List<EstrategiaPrecoResponseDTO> listaEstrategiasResponse = new ArrayList<>();
 
         for (EstrategiaPreco entidade : listaEstrategiasEntidade) {
-            listaEstrategiasResponse.add(EstrategiaPrecoResponseDTO.fromEntity(entidade));
+            listaEstrategiasResponse.add(toResponseDTO(entidade));
         }
 
         return listaEstrategiasResponse;
@@ -64,11 +67,10 @@ public class EstrategiaPrecoService {
 
     @Transactional(readOnly = true)
     public EstrategiaPrecoResponseDTO buscarEstrategiaPorId(Long id) {
-        EstrategiaPreco estrategiaPreco = estrategiaPrecoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Estrategia de preco nao encontrada")
-        );
+        EstrategiaPreco estrategiaPreco = estrategiaPrecoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Estrategia de preco nao encontrada"));
 
-        return EstrategiaPrecoResponseDTO.fromEntity(estrategiaPreco);
+        return toResponseDTO(estrategiaPreco);
     }
 
     @Transactional(readOnly = true)
@@ -77,61 +79,117 @@ public class EstrategiaPrecoService {
         List<EstrategiaPrecoResponseDTO> listaEstrategiasResponse = new ArrayList<>();
 
         for (EstrategiaPreco entidade : listaEstrategiasEntidade) {
-            listaEstrategiasResponse.add(EstrategiaPrecoResponseDTO.fromEntity(entidade));
+            listaEstrategiasResponse.add(toResponseDTO(entidade));
         }
 
         return listaEstrategiasResponse;
     }
 
-    public void deletarEstrategiaPorId(Long id) { estrategiaPrecoRepository.deleteById(id); }
+    @Transactional
+    public void deletarEstrategiaPorId(Long id) {
+        estrategiaPrecoRepository.deleteById(id);
+    }
 
     private EstrategiaPreco calcularEstrategiaPreco(EstrategiaPrecoRequestDTO request, Produto produto) {
-
         BigDecimal margemLucroFracao = converterPercentualParaFracao(request.getMargemLucro());
         BigDecimal percentualImpostoFracao = converterPercentualParaFracao(request.getPercentualImposto());
 
         BigDecimal precoSugerido = calcularPrecoSugerido(
-                produto.getPrecoCusto(), margemLucroFracao, percentualImpostoFracao);
+                produto.getPrecoCusto(),
+                margemLucroFracao,
+                percentualImpostoFracao
+        );
+
+        BigDecimal impostoUnitario = calcularImpostoUnitario(
+                precoSugerido,
+                percentualImpostoFracao
+        );
 
         BigDecimal lucroUnitario = calcularLucroUnitario(
-                produto.getPrecoCusto(), precoSugerido, percentualImpostoFracao);
+                produto.getPrecoCusto(),
+                precoSugerido,
+                impostoUnitario
+        );
 
         Integer demandaEstimada = calcularDemandaEstimada(
-                produto.getDemandaBase(), precoSugerido, produto.getFatorElasticidade());
+                produto.getDemandaBase(),
+                precoSugerido,
+                produto.getFatorElasticidade()
+        );
 
         BigDecimal lucroTotalEstimado = calcularLucroTotalEstimado(lucroUnitario, demandaEstimada);
 
-        return toEntity(request, produto, precoSugerido, lucroUnitario,
-                demandaEstimada, lucroTotalEstimado, Instant.now());
+        return toEntity(
+                request,
+                produto,
+                precoSugerido,
+                lucroUnitario,
+                demandaEstimada,
+                lucroTotalEstimado,
+                Instant.now()
+        );
+    }
+
+    private EstrategiaPrecoResponseDTO toResponseDTO(EstrategiaPreco estrategiaPreco) {
+        EstrategiaPrecoResponseDTO response = EstrategiaPrecoResponseDTO.fromEntity(estrategiaPreco);
+
+        BigDecimal percentualImpostoFracao = converterPercentualParaFracao(estrategiaPreco.getPercentualImposto());
+
+        BigDecimal impostoUnitario = calcularImpostoUnitario(
+                estrategiaPreco.getPrecoSugerido(),
+                percentualImpostoFracao
+        );
+
+        BigDecimal impostoTotal = calcularImpostoTotal(
+                impostoUnitario,
+                estrategiaPreco.getDemandaEstimada()
+        );
+
+        response.setImpostoUnitario(impostoUnitario);
+        response.setImpostoTotal(impostoTotal);
+
+        return response;
     }
 
     private BigDecimal calcularPrecoSugerido(
             BigDecimal precoCusto,
-            BigDecimal margemLucro,
-            BigDecimal percentualImposto
+            BigDecimal margemLucroFracao,
+            BigDecimal percentualImpostoFracao
     ) {
         // precoSugerido = precoCusto * (1 + margemLucro) * (1 + percentualImposto)
-        BigDecimal fatorMargemLucro = BigDecimal.ONE.add(margemLucro);
-        BigDecimal fatorPercentualImposto = BigDecimal.ONE.add(percentualImposto);
+        BigDecimal fatorMargemLucro = BigDecimal.ONE.add(margemLucroFracao);
+        BigDecimal fatorPercentualImposto = BigDecimal.ONE.add(percentualImpostoFracao);
 
-        return precoCusto.multiply(fatorMargemLucro).multiply(fatorPercentualImposto);
+        return precoCusto
+                .multiply(fatorMargemLucro)
+                .multiply(fatorPercentualImposto)
+                .setScale(SCALE_MONETARIO, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal calcularImpostoUnitario(
+            BigDecimal precoSugerido,
+            BigDecimal percentualImpostoFracao
+    ) {
+        // impostoUnitario = parte do imposto embutida no precoSugerido
+        BigDecimal precoSemImposto = precoSugerido.divide(
+                BigDecimal.ONE.add(percentualImpostoFracao),
+                SCALE_MONETARIO,
+                RoundingMode.HALF_UP
+        );
+
+        return precoSugerido.subtract(precoSemImposto)
+                .setScale(SCALE_MONETARIO, RoundingMode.HALF_UP);
     }
 
     private BigDecimal calcularLucroUnitario(
             BigDecimal precoCusto,
             BigDecimal precoSugerido,
-            BigDecimal percentualImposto
+            BigDecimal impostoUnitario
     ) {
-        // lucroUnitario = precoSugerido - precoCusto - valorImposto
-
-        BigDecimal valorSemImposto = precoSugerido.divide(
-                BigDecimal.ONE.add(percentualImposto),
-                2,
-                RoundingMode.HALF_UP
-        );
-        BigDecimal valorImposto = precoSugerido.subtract(valorSemImposto);
-
-        return precoSugerido.subtract(precoCusto).subtract(valorImposto);
+        // lucroUnitario = precoSugerido - precoCusto - impostoUnitario
+        return precoSugerido.subtract(precoCusto)
+                .subtract(impostoUnitario)
+                .setScale(SCALE_MONETARIO, RoundingMode.HALF_UP);
     }
 
     private Integer calcularDemandaEstimada(
@@ -146,7 +204,15 @@ public class EstrategiaPrecoService {
 
         Integer demandaEstimada = demandaBase - quedaEstimadaVendas;
 
-        return (demandaEstimada > 0) ? demandaEstimada : 0;
+        return Math.max(demandaEstimada, 0);
+    }
+
+    private BigDecimal calcularImpostoTotal(
+            BigDecimal impostoUnitario,
+            Integer demandaEstimada
+    ) {
+        return impostoUnitario.multiply(BigDecimal.valueOf(demandaEstimada))
+                .setScale(SCALE_MONETARIO, RoundingMode.HALF_UP);
     }
 
     private BigDecimal calcularLucroTotalEstimado(
@@ -154,16 +220,20 @@ public class EstrategiaPrecoService {
             Integer demandaEstimada
     ) {
         // lucroTotalEstimado = lucroUnitario * demandaEstimada
-        return lucroUnitario.multiply(
-                BigDecimal.valueOf(demandaEstimada)
-        );
+        return lucroUnitario.multiply(BigDecimal.valueOf(demandaEstimada))
+                .setScale(SCALE_MONETARIO, RoundingMode.HALF_UP);
     }
 
     private EstrategiaPreco toEntity(
-            EstrategiaPrecoRequestDTO dto, Produto produto, BigDecimal precoSugerido, BigDecimal lucroUnitario,
-            Integer demandaEstimada, BigDecimal lucroTotalEstimado, Instant dataSimulacao
+            EstrategiaPrecoRequestDTO dto,
+            Produto produto,
+            BigDecimal precoSugerido,
+            BigDecimal lucroUnitario,
+            Integer demandaEstimada,
+            BigDecimal lucroTotalEstimado,
+            Instant dataSimulacao
     ) {
-        EstrategiaPreco estrategiaPreco = EstrategiaPreco.builder()
+        return EstrategiaPreco.builder()
                 .produto(produto)
                 .margemLucro(dto.getMargemLucro())
                 .percentualImposto(dto.getPercentualImposto())
@@ -173,11 +243,9 @@ public class EstrategiaPrecoService {
                 .lucroTotalEstimado(lucroTotalEstimado)
                 .dataSimulacao(dataSimulacao)
                 .build();
-
-        return estrategiaPreco;
     }
 
     private BigDecimal converterPercentualParaFracao(BigDecimal percentual) {
-        return percentual.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+        return percentual.divide(BigDecimal.valueOf(100), SCALE_PERCENTUAL, RoundingMode.HALF_UP);
     }
 }

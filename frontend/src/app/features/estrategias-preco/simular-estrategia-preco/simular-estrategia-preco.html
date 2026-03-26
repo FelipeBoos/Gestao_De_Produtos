@@ -10,7 +10,7 @@
 
     <div class="simulacao-layout">
 
-        <div class="coluna-esquerda">
+        <aside class="coluna-esquerda">
             <section class="coluna-formulario">
                 <form (ngSubmit)="simularEstrategiaDePreco()">
 
@@ -61,59 +61,53 @@
                     </div>
                 </form>
             </section>
-
-            <section class="coluna-produto">
-                @if (resultadoSimulacao; as resultado) {
-                    <section class="resultado-simulacao">
-                        <div class="resultado-titulo">
-                            <p>Resultado da simulação:</p>
-                        </div>
-
-                        <div class="card card-dados-produto">
-                            <div class="card-header azul">
-                                Dados do produto
-                            </div>
-
-                            <div class="resultado-linhas">
-                                <div class="linha linha-2-colunas">
-                                    <div class="bloco-info">
-                                        <span>Nome</span>
-                                        <strong>{{ resultado.produtoNome }}</strong>
-                                    </div>
-
-                                    <div class="bloco-info">
-                                        <span>Categoria</span>
-                                        <strong>* Fazer *</strong>
-                                    </div>
-                                </div>
-
-                                <div class="linha linha-2-colunas">
-                                    <div class="bloco-info">
-                                        <span>Preço unidade</span>
-                                        <strong>R$ * fazer *</strong>
-                                    </div>
-
-                                    <div class="bloco-info">
-                                        <span>Demanda base</span>
-                                        <strong>* fazer *</strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                } @else {
-                    <section class="resultado-vazio resultado-vazio-menor">
-                        <p>Os dados do produto aparecerão aqui após a simulação.</p>
-                    </section>
-                }
-            </section>
-        </div>
+        </aside>
 
         <section class="coluna-resultado">
             @if (resultadoSimulacao; as resultado) {
                 <section class="resultado-simulacao">
 
-                    <div class="resultado-info">
+
+                    <div class="resultado-layout">
+                        <div class="grafico-placeholder">
+                            <div class="grafico-wrapper">
+                                <canvas #graficoRosca></canvas>
+                            </div>
+                        </div>
+                        <div class="area-cards">
+                            <div class="card card-dados-produto">
+                                <div class="card-header azul">
+                                    Dados do produto
+                                </div>
+
+                                <div class="resultado-linhas">
+                                    <div class="linha linha-2-colunas">
+                                        <div class="bloco-info">
+                                            <span>Nome</span>
+                                            <strong>{{ resultado.produtoNome }}</strong>
+                                        </div>
+
+                                        <div class="bloco-info">
+                                            <span>Categoria</span>
+                                            <strong>* Fazer *</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="linha linha-2-colunas">
+                                        <div class="bloco-info">
+                                            <span>Preço unidade</span>
+                                            <strong>R$ * fazer *</strong>
+                                        </div>
+
+                                        <div class="bloco-info">
+                                            <span>Demanda base</span>
+                                            <strong>* fazer *</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                                                <div class="resultado-info">
                         <p>
                             Margem de lucro: {{ margemLucro }}% - percentual de imposto: {{ percentualImposto }}%
                         </p>
@@ -123,63 +117,65 @@
                         </p>
                     </div>
 
-                    <div class="card card-resultado card-resultado-principal">
-                        <div class="card-header verde">
-                            Estratégia de preço - {{ resultado.produtoNome }}
+                            <div class="card card-resultado card-resultado-principal">
+                                <div class="card-header verde">
+                                    Estratégia de preço - {{ resultado.produtoNome }}
+                                </div>
+
+                                <div class="resultado-linhas">
+                                    <div class="linha linha-2-colunas">
+                                        <div class="bloco-info">
+                                            <span>Preço sugerido</span>
+                                            <strong>{{ resultado.precoSugerido | currency:'BRL' }}</strong>
+                                        </div>
+
+                                        <div class="bloco-info">
+                                            <span>Demanda estimada</span>
+                                            <strong>
+                                                {{ resultado.demandaEstimada }}
+                                                {{ resultado.demandaEstimada > 1 ? ' unidades' : ' unidade' }}
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="linha linha-2-colunas">
+                                        <div class="bloco-info">
+                                            <span>Imposto unitário</span>
+                                            <strong>-</strong>
+                                        </div>
+
+                                        <div class="bloco-info">
+                                            <span>Imposto total</span>
+                                            <strong>-</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="linha linha-centralizada">
+                                        <div class="bloco-info bloco-centro">
+                                            <span>Lucro unitário</span>
+                                            <strong>{{ resultado.lucroUnitario | currency:'BRL' }}</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="linha linha-lucro-total">
+                                        <div class="card-lucro-total">
+                                            <span>Lucro total</span>
+                                            <strong>{{ resultado.lucroTotalEstimado | currency:'BRL' }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="acoes-resultado">
+                                <button
+                                    type="button"
+                                    class="btn-success"
+                                    (click)="salvarEstrategia()"
+                                >
+                                    Salvar estratégia
+                                </button>
+                            </div>
                         </div>
-
-                        <div class="resultado-linhas">
-                            <div class="linha linha-2-colunas">
-                                <div class="bloco-info">
-                                    <span>Preço sugerido</span>
-                                    <strong>{{ resultado.precoSugerido | currency:'BRL' }}</strong>
-                                </div>
-
-                                <div class="bloco-info">
-                                    <span>Demanda estimada</span>
-                                    <strong>
-                                        {{ resultado.demandaEstimada }}
-                                        {{ resultado.demandaEstimada > 1 ? ' unidades' : ' unidade' }}
-                                    </strong>
-                                </div>
-                            </div>
-
-                            <div class="linha linha-2-colunas">
-                                <div class="bloco-info">
-                                    <span>Imposto unitário</span>
-                                    <strong>-</strong>
-                                </div>
-
-                                <div class="bloco-info">
-                                    <span>Imposto total</span>
-                                    <strong>-</strong>
-                                </div>
-                            </div>
-
-                            <div class="linha linha-centralizada">
-                                <div class="bloco-info bloco-centro">
-                                    <span>Lucro unitário</span>
-                                    <strong>{{ resultado.lucroUnitario | currency:'BRL' }}</strong>
-                                </div>
-                            </div>
-
-                            <div class="linha linha-lucro-total">
-                                <div class="card-lucro-total">
-                                    <span>Lucro total</span>
-                                    <strong>{{ resultado.lucroTotalEstimado | currency:'BRL' }}</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="acoes-resultado">
-                        <button
-                            type="button"
-                            class="btn-success"
-                            (click)="salvarEstrategia()"
-                        >
-                            Salvar estratégia
-                        </button>
                     </div>
                 </section>
             } @else {
@@ -190,5 +186,4 @@
         </section>
 
     </div>
-
 </section>

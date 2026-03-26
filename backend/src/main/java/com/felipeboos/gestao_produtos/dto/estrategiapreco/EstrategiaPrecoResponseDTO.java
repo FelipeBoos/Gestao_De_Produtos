@@ -13,13 +13,18 @@ public class EstrategiaPrecoResponseDTO {
 
     private Long produtoId;
     private String produtoNome;
+    private String categoriaNome;
+    private BigDecimal precoUnidade;
+    private Integer demandaBase;
 
     private BigDecimal margemLucro;
     private BigDecimal percentualImposto;
 
     private BigDecimal precoSugerido;
-    private BigDecimal lucroUnitario;
     private Integer demandaEstimada;
+    private BigDecimal impostoUnitario;
+    private BigDecimal impostoTotal;
+    private BigDecimal lucroUnitario;
     private BigDecimal lucroTotalEstimado;
 
     private Instant dataSimulacao;
@@ -32,14 +37,17 @@ public class EstrategiaPrecoResponseDTO {
         if (estrategiaPreco.getProduto() != null) {
             dto.setProdutoId(estrategiaPreco.getProduto().getId());
             dto.setProdutoNome(estrategiaPreco.getProduto().getNome());
+            dto.setCategoriaNome(estrategiaPreco.getProduto().getCategoria().getNome());
+            dto.setPrecoUnidade(estrategiaPreco.getProduto().getPrecoCusto());
+            dto.setDemandaBase(estrategiaPreco.getProduto().getDemandaBase());
         }
 
         dto.setMargemLucro(estrategiaPreco.getMargemLucro());
         dto.setPercentualImposto(estrategiaPreco.getPercentualImposto());
 
         dto.setPrecoSugerido(estrategiaPreco.getPrecoSugerido());
-        dto.setLucroUnitario(estrategiaPreco.getLucroUnitario());
         dto.setDemandaEstimada(estrategiaPreco.getDemandaEstimada());
+        dto.setLucroUnitario(estrategiaPreco.getLucroUnitario());
         dto.setLucroTotalEstimado(estrategiaPreco.getLucroTotalEstimado());
 
         dto.setDataSimulacao(estrategiaPreco.getDataSimulacao());
