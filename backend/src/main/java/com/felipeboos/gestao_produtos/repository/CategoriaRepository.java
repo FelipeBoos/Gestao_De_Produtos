@@ -9,5 +9,7 @@ import java.util.Optional;
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
     Optional<Categoria> findByNome(String nome);
 
+    Boolean existsByNome(String nome);
+
     List<Categoria> findAllByOrderByIdAsc();
 }

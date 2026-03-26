@@ -4,6 +4,9 @@ import com.felipeboos.gestao_produtos.dto.categoria.CategoriaRequestDTO;
 import com.felipeboos.gestao_produtos.dto.categoria.CategoriaResponseDTO;
 import com.felipeboos.gestao_produtos.dto.categoria.CategoriaUpdateDTO;
 import com.felipeboos.gestao_produtos.entity.Categoria;
+import com.felipeboos.gestao_produtos.exception.RecursoDuplicadoException;
+import com.felipeboos.gestao_produtos.exception.RecursoNaoEncontradoException;
+import com.felipeboos.gestao_produtos.exception.RegraDeNegocioException;
 import com.felipeboos.gestao_produtos.repository.CategoriaRepository;
 import com.felipeboos.gestao_produtos.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,10 @@ public class CategoriaService {
 
     public CategoriaResponseDTO salvarCategoria(CategoriaRequestDTO dto) {
 
+        if (repository.existsByNome(dto.getNome())) {
+            throw new RecursoDuplicadoException("Já existe uma categoria cadastrada com esse nome");
+        }
+
         Categoria categoria = toEntity(dto);
 
         Categoria categoriaSalva = repository.saveAndFlush(categoria);
@@ -34,7 +41,7 @@ public class CategoriaService {
     public CategoriaResponseDTO buscarCategoriaPorId(Long id) {
 
         Categoria categoria = repository.findById(id).orElseThrow(
-                () -> new RuntimeException("Id nao encontrado")
+                () -> new RecursoNaoEncontradoException("Nenhuma categoria informada para o id informado")
         );
 
         return CategoriaResponseDTO.fromEntity(categoria);
@@ -43,7 +50,7 @@ public class CategoriaService {
     public List<CategoriaResponseDTO> buscarCategoriaPorNome(String nome) {
 
         Categoria categoria = repository.findByNome(nome).orElseThrow(
-                () -> new RuntimeException("Nome nao encontrado")
+                () -> new RecursoNaoEncontradoException("Nenhuma categoria encontrada para o nome informado")
         );
 
         return List.of(CategoriaResponseDTO.fromEntity(categoria));
@@ -62,8 +69,12 @@ public class CategoriaService {
     }
 
     public void deletarCategoriaPorId(Long id) {
+        if (!repository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Nenhuma categoria encontrada para o id informado");
+        }
+
         if (produtoRepository.existsByCategoriaId(id)) {
-            throw new IllegalStateException(
+            throw new RegraDeNegocioException(
                     "Nao eh possivel excluir uma categoria se ja existe um produto vinculado a ela"
             );
         }
@@ -74,8 +85,14 @@ public class CategoriaService {
     public void atualizarCategoriaPorId(Long id, CategoriaUpdateDTO categoriaPatch) {
 
         Categoria categoriaEntity = repository.findById(id).orElseThrow(
-                () -> new RuntimeException("Nenhuma categoria encontrada para o Id informado")
+                () -> new RecursoNaoEncontradoException("Nenhuma categoria encontrada para o Id informado")
         );
+
+        if (categoriaPatch.getNome() != null
+                && !categoriaEntity.getNome().equals(categoriaPatch.getNome())
+                && repository.existsByNome(categoriaPatch.getNome())) {
+            throw new RecursoDuplicadoException("Já existe uma categoria cadastrada com o nome informado");
+        }
 
         aplicarAlteracoes(categoriaEntity, categoriaPatch);
 

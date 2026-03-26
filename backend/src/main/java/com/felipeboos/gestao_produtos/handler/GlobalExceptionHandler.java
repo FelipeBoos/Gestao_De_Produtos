@@ -1,8 +1,8 @@
 package com.felipeboos.gestao_produtos.handler;
 
-import com.felipeboos.gestao_produtos.excecao.RecursoDuplicadoException;
-import com.felipeboos.gestao_produtos.excecao.RecursoNaoEncontradoException;
-import com.felipeboos.gestao_produtos.excecao.RegraDeNegocioException;
+import com.felipeboos.gestao_produtos.exception.RecursoDuplicadoException;
+import com.felipeboos.gestao_produtos.exception.RecursoNaoEncontradoException;
+import com.felipeboos.gestao_produtos.exception.RegraDeNegocioException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

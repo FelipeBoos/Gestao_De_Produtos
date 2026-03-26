@@ -4,6 +4,8 @@ import com.felipeboos.gestao_produtos.dto.categoria.CategoriaRequestDTO;
 import com.felipeboos.gestao_produtos.dto.categoria.CategoriaResponseDTO;
 import com.felipeboos.gestao_produtos.dto.categoria.CategoriaUpdateDTO;
 import com.felipeboos.gestao_produtos.entity.Categoria;
+import com.felipeboos.gestao_produtos.exception.RecursoNaoEncontradoException;
+import com.felipeboos.gestao_produtos.exception.RegraDeNegocioException;
 import com.felipeboos.gestao_produtos.repository.CategoriaRepository;
 import com.felipeboos.gestao_produtos.repository.ProdutoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,10 +89,10 @@ class CategoriaServiceTest {
     void t3_deveLancarExcecaoAoBuscarCategoriaPorIdInexistente() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(RuntimeException.class,
+        RecursoNaoEncontradoException exception = assertThrows(RecursoNaoEncontradoException.class,
                 () -> categoriaService.buscarCategoriaPorId(1L));
 
-        assertEquals("Id nao encontrado", exception.getMessage());
+        assertEquals("Nenhuma categoria informada para o id informado", exception.getMessage());
         verify(repository, times(1)).findById(1L);
     }
 
@@ -113,10 +115,10 @@ class CategoriaServiceTest {
     void t5_deveLancarExcecaoAoBuscarPorNomeInexistente() {
         when(repository.findByNome("Inexistente")).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(RuntimeException.class,
+        RecursoNaoEncontradoException exception = assertThrows(RecursoNaoEncontradoException.class,
                 () -> categoriaService.buscarCategoriaPorNome("Inexistente"));
 
-        assertEquals("Nome nao encontrado", exception.getMessage());
+        assertEquals("Nenhuma categoria encontrada para o nome informado", exception.getMessage());
         verify(repository, times(1)).findByNome("Inexistente");
     }
 
@@ -157,11 +159,13 @@ class CategoriaServiceTest {
     @Test
     @DisplayName("T8 - CategoriaServiceTest - Deve deletar categoria por id quando não houver produtos vinculados")
     void t8_deveDeletarCategoriaPorIdQuandoNaoHouverProdutosVinculados() {
+        when(repository.existsById(1L)).thenReturn(true);
         when(produtoRepository.existsByCategoriaId(1L)).thenReturn(false);
         doNothing().when(repository).deleteById(1L);
 
         categoriaService.deletarCategoriaPorId(1L);
 
+        verify(repository, times(1)).existsById(1L);
         verify(produtoRepository, times(1)).existsByCategoriaId(1L);
         verify(repository, times(1)).deleteById(1L);
     }
@@ -169,9 +173,10 @@ class CategoriaServiceTest {
     @Test
     @DisplayName("T9 - CategoriaServiceTest - Deve lançar exceção ao deletar categoria com produtos vinculados")
     void t9_deveLancarExcecaoAoDeletarCategoriaComProdutosVinculados() {
+        when(repository.existsById(1L)).thenReturn(true);
         when(produtoRepository.existsByCategoriaId(1L)).thenReturn(true);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class,
+        RegraDeNegocioException exception = assertThrows(RegraDeNegocioException.class,
                 () -> categoriaService.deletarCategoriaPorId(1L));
 
         assertEquals("Nao eh possivel excluir uma categoria se ja existe um produto vinculado a ela",
@@ -181,8 +186,21 @@ class CategoriaServiceTest {
     }
 
     @Test
-    @DisplayName("T10 - CategoriaServiceTest - Deve atualizar categoria por id com sucesso")
-    void t10_deveAtualizarCategoriaPorIdComSucesso() {
+    @DisplayName("T10 - CategoriaServiceTest - Deve lançar exceção ao tentar deletar categoria com id não cadastrado")
+    void t10_deveLancarExcecaoAoTentarDeletarCategoriaComIdNaoCadastrado() {
+        when(repository.existsById(1L)).thenReturn(false);
+
+        RecursoNaoEncontradoException exception = assertThrows(RecursoNaoEncontradoException.class,
+                () -> categoriaService.deletarCategoriaPorId(1L));
+
+        assertEquals("Nenhuma categoria encontrada para o id informado", exception.getMessage());
+        verify(produtoRepository, never()).existsByCategoriaId(anyLong());
+        verify(repository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    @DisplayName("T11 - CategoriaServiceTest - Deve atualizar categoria por id com sucesso")
+    void t11_deveAtualizarCategoriaPorIdComSucesso() {
         when(repository.findById(1L)).thenReturn(Optional.of(categoria));
         when(repository.saveAndFlush(any(Categoria.class))).thenReturn(categoria);
 
@@ -196,8 +214,8 @@ class CategoriaServiceTest {
     }
 
     @Test
-    @DisplayName("T11 - CategoriaServiceTest - Deve atualizar apenas o nome quando descrição for nula")
-    void t11_deveAtualizarApenasONomeQuandoDescricaoForNula() {
+    @DisplayName("T12 - CategoriaServiceTest - Deve atualizar apenas o nome quando descrição for nula")
+    void t12_deveAtualizarApenasONomeQuandoDescricaoForNula() {
         CategoriaUpdateDTO updateParcial = new CategoriaUpdateDTO();
         updateParcial.setNome("Novo nome");
         updateParcial.setDescricao(null);
@@ -215,8 +233,8 @@ class CategoriaServiceTest {
     }
 
     @Test
-    @DisplayName("T12 - CategoriaServiceTest - Deve lançar exceção ao atualizar categoria com id inexistente")
-    void t12_deveLancarExcecaoAoAtualizarCategoriaComIdInexistente() {
+    @DisplayName("T13 - CategoriaServiceTest - Deve lançar exceção ao atualizar categoria com id inexistente")
+    void t13_deveLancarExcecaoAoAtualizarCategoriaComIdInexistente() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class,
