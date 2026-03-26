@@ -89,19 +89,19 @@
 
                                         <div class="bloco-info">
                                             <span>Categoria</span>
-                                            <strong>* Fazer *</strong>
+                                            <strong> {{ resultado.categoriaNome }}</strong>
                                         </div>
                                     </div>
 
                                     <div class="linha linha-2-colunas">
                                         <div class="bloco-info">
                                             <span>Preço unidade</span>
-                                            <strong>R$ * fazer *</strong>
+                                            <strong>{{ resultado.precoUnidade | currency:'BRL' }}</strong>
                                         </div>
 
                                         <div class="bloco-info">
                                             <span>Demanda base</span>
-                                            <strong>* fazer *</strong>
+                                            <strong>{{ resultado.demandaBase}} {{ resultado.demandaBase > 1 ? ' unidades' : 'unidade' }}</strong>
                                         </div>
                                     </div>
                                 </div>
@@ -141,12 +141,12 @@
                                     <div class="linha linha-2-colunas">
                                         <div class="bloco-info">
                                             <span>Imposto unitário</span>
-                                            <strong>-</strong>
+                                            <strong>{{ resultado.impostoUnitario | currency:'BRL' }}</strong>
                                         </div>
 
                                         <div class="bloco-info">
                                             <span>Imposto total</span>
-                                            <strong>-</strong>
+                                            <strong>{{ resultado.impostoTotal | currency:'BRL' }}</strong>
                                         </div>
                                     </div>
 
