@@ -4,6 +4,7 @@ import com.felipeboos.gestao_produtos.dto.categoria.CategoriaRequestDTO;
 import com.felipeboos.gestao_produtos.dto.categoria.CategoriaResponseDTO;
 import com.felipeboos.gestao_produtos.dto.categoria.CategoriaUpdateDTO;
 import com.felipeboos.gestao_produtos.entity.Categoria;
+import com.felipeboos.gestao_produtos.exception.RecursoDuplicadoException;
 import com.felipeboos.gestao_produtos.exception.RecursoNaoEncontradoException;
 import com.felipeboos.gestao_produtos.exception.RegraDeNegocioException;
 import com.felipeboos.gestao_produtos.repository.CategoriaRepository;
@@ -59,6 +60,7 @@ class CategoriaServiceTest {
     @Test
     @DisplayName("T1 - CategoriaServiceTest - Deve salvar categoria com sucesso")
     void t1_deveSalvarCategoriaComSucesso() {
+        when(repository.existsByNome("Eletrônicos")).thenReturn(false);
         when(repository.saveAndFlush(any(Categoria.class))).thenReturn(categoria);
 
         CategoriaResponseDTO response = categoriaService.salvarCategoria(categoriaRequestDTO);
@@ -68,6 +70,19 @@ class CategoriaServiceTest {
         assertEquals("Categoria de produtos eletrônicos", response.getDescricao());
 
         verify(repository, times(1)).saveAndFlush(any(Categoria.class));
+    }
+
+    @Test
+    @DisplayName("T2 - CategoriaServiceTest - Deve lançar exceção ao tentar salvar categoria com nome já cadastrado")
+    void t2_deveLancarExcecaoAoTentarSalvarCategoriaComNomeJaCadastrado() {
+        when(repository.existsByNome("Eletrônicos")).thenReturn(true);
+
+        RecursoDuplicadoException exception = assertThrows(RecursoDuplicadoException.class,
+                () -> categoriaService.salvarCategoria(categoriaRequestDTO));
+
+        assertEquals("Já existe uma categoria cadastrada com esse nome", exception.getMessage());
+
+        verify(repository, never()).saveAndFlush(any(Categoria.class));
     }
 
     @Test
@@ -202,6 +217,7 @@ class CategoriaServiceTest {
     @DisplayName("T11 - CategoriaServiceTest - Deve atualizar categoria por id com sucesso")
     void t11_deveAtualizarCategoriaPorIdComSucesso() {
         when(repository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(repository.existsByNome("Informática")).thenReturn(false);
         when(repository.saveAndFlush(any(Categoria.class))).thenReturn(categoria);
 
         categoriaService.atualizarCategoriaPorId(1L, categoriaUpdateDTO);
@@ -210,12 +226,28 @@ class CategoriaServiceTest {
         assertEquals("Categoria atualizada", categoria.getDescricao());
 
         verify(repository, times(1)).findById(1L);
+        verify(repository, times(1)).existsByNome("Informática");
         verify(repository, times(1)).saveAndFlush(categoria);
+    }
+
+    @Test
+    @DisplayName("Tx - CategoriaServiceTest - Deve lançar exceção ao atualizar categoria com nome já cadastrado")
+    void tx_deveLancarExcecaoAoAtualizarCategoriaComNomeJaCadastrado() {
+        when(repository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(repository.existsByNome("Informática")).thenReturn(true);
+
+        RecursoDuplicadoException exception = assertThrows(RecursoDuplicadoException.class,
+                () -> categoriaService.atualizarCategoriaPorId(1L, categoriaUpdateDTO));
+
+        assertEquals("Já existe uma categoria cadastrada com o nome informado", exception.getMessage());
+
+        verify(repository, never()).saveAndFlush(any(Categoria.class));
     }
 
     @Test
     @DisplayName("T12 - CategoriaServiceTest - Deve atualizar apenas o nome quando descrição for nula")
     void t12_deveAtualizarApenasONomeQuandoDescricaoForNula() {
+        when(repository.existsByNome("Novo nome")).thenReturn(false);
         CategoriaUpdateDTO updateParcial = new CategoriaUpdateDTO();
         updateParcial.setNome("Novo nome");
         updateParcial.setDescricao(null);
@@ -237,7 +269,7 @@ class CategoriaServiceTest {
     void t13_deveLancarExcecaoAoAtualizarCategoriaComIdInexistente() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(RuntimeException.class,
+        RecursoNaoEncontradoException exception = assertThrows(RecursoNaoEncontradoException.class,
                 () -> categoriaService.atualizarCategoriaPorId(1L, categoriaUpdateDTO));
 
         assertEquals("Nenhuma categoria encontrada para o Id informado", exception.getMessage());
