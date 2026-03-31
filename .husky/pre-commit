@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-echo "Rodando testes do backend antes do commit (husky)..."
+echo "Rodando testes do backend antes do commit..."
 
 cd backend || exit 1
 
