@@ -4,14 +4,17 @@ import com.felipeboos.gestao_produtos.dto.produto.ProdutoRequestDTO;
 import com.felipeboos.gestao_produtos.dto.produto.ProdutoResponseDTO;
 import com.felipeboos.gestao_produtos.dto.produto.ProdutoUpdateDTO;
 import com.felipeboos.gestao_produtos.entity.Categoria;
+import com.felipeboos.gestao_produtos.entity.Moeda;
 import com.felipeboos.gestao_produtos.entity.Produto;
 import com.felipeboos.gestao_produtos.exception.RecursoDuplicadoException;
 import com.felipeboos.gestao_produtos.exception.RecursoNaoEncontradoException;
 import com.felipeboos.gestao_produtos.repository.CategoriaRepository;
 import com.felipeboos.gestao_produtos.repository.ProdutoRepository;
+import com.felipeboos.gestao_produtos.service.cambio.CambioService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +23,16 @@ public class ProdutoService {
 
     private final ProdutoRepository repository;
     private final CategoriaRepository catRepository;
+    private final CambioService cambioService;
 
-    public ProdutoService(ProdutoRepository repository, CategoriaRepository catRepository) {
+    public ProdutoService(
+            ProdutoRepository repository,
+            CategoriaRepository catRepository,
+            CambioService cambioService
+    ) {
         this.repository = repository;
         this.catRepository = catRepository;
+        this.cambioService = cambioService;
     }
 
     @Transactional
@@ -108,20 +117,25 @@ public class ProdutoService {
         if (produtoPatch.getPrecoCusto() != null) {
             produtoEntity.setPrecoCusto(produtoPatch.getPrecoCusto());
         }
+        if (produtoPatch.getMoeda() != null) {
+            produtoEntity.setMoeda(produtoPatch.getMoeda());
+        }
         if (produtoPatch.getPrecoVenda() != null) {
             produtoEntity.setPrecoVenda(produtoPatch.getPrecoVenda());
         }
         if (produtoPatch.getQuantidadeEstoque() != null) {
             produtoEntity.setQuantidadeEstoque(produtoPatch.getQuantidadeEstoque());
         }
-
         if (produtoPatch.getDemandaBase() != null) {
             produtoEntity.setDemandaBase(produtoPatch.getDemandaBase());
         }
-
         if (produtoPatch.getFatorElasticidade() != null) {
             produtoEntity.setFatorElasticidade(produtoPatch.getFatorElasticidade());
         }
+
+        BigDecimal cotacao = cambioService.obterCotacao(produtoEntity.getMoeda());
+        produtoEntity.setCotacaoMoeda(cotacao);
+        produtoEntity.setPrecoCustoEmReais(produtoEntity.getPrecoCusto().multiply(cotacao));
     }
 
     private void setCategoria(Produto produtoEntity, Long categoriaId) {
@@ -144,6 +158,13 @@ public class ProdutoService {
                 .build();
 
         setCategoria(produto, dto.getCategoriaId());
+
+        Moeda moeda = dto.getMoeda() != null ? dto.getMoeda() : Moeda.BRL;
+        BigDecimal cotacao = cambioService.obterCotacao(moeda);
+
+        produto.setMoeda(moeda);
+        produto.setCotacaoMoeda(cotacao);
+        produto.setPrecoCustoEmReais(dto.getPrecoCusto().multiply(cotacao));
 
         return produto;
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.felipeboos.gestao_produtos.dto.produto.ProdutoRequestDTO;
 import com.felipeboos.gestao_produtos.dto.produto.ProdutoResponseDTO;
 import com.felipeboos.gestao_produtos.dto.produto.ProdutoUpdateDTO;
+import com.felipeboos.gestao_produtos.entity.Moeda;
 import com.felipeboos.gestao_produtos.exception.RecursoDuplicadoException;
 import com.felipeboos.gestao_produtos.exception.RecursoNaoEncontradoException;
 import com.felipeboos.gestao_produtos.handler.GlobalExceptionHandler;
@@ -11,10 +12,10 @@ import com.felipeboos.gestao_produtos.service.ProdutoService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -45,7 +46,7 @@ class ProdutoControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @MockitoBean
+    @MockBean
     private ProdutoService service;
 
     @Test
@@ -58,6 +59,9 @@ class ProdutoControllerTest {
         responseDTO.setCategoriaId(1L);
         responseDTO.setCategoriaNome("Eletrônicos");
         responseDTO.setPrecoCusto(BigDecimal.valueOf(450));
+        responseDTO.setMoeda(Moeda.BRL);
+        responseDTO.setCotacaoMoeda(BigDecimal.ONE);
+        responseDTO.setPrecoCustoEmReais(BigDecimal.valueOf(450));
         responseDTO.setPrecoVenda(BigDecimal.valueOf(600));
         responseDTO.setQuantidadeEstoque(10);
         responseDTO.setDemandaBase(100);
@@ -105,6 +109,9 @@ class ProdutoControllerTest {
         produto1.setCategoriaId(1L);
         produto1.setCategoriaNome("Eletrônicos");
         produto1.setPrecoCusto(BigDecimal.valueOf(450));
+        produto1.setMoeda(Moeda.BRL);
+        produto1.setCotacaoMoeda(BigDecimal.ONE);
+        produto1.setPrecoCustoEmReais(BigDecimal.valueOf(450));
         produto1.setPrecoVenda(BigDecimal.valueOf(600));
         produto1.setQuantidadeEstoque(10);
         produto1.setDemandaBase(100);
@@ -116,6 +123,9 @@ class ProdutoControllerTest {
         produto2.setCategoriaId(1L);
         produto2.setCategoriaNome("Eletrônicos");
         produto2.setPrecoCusto(BigDecimal.valueOf(370));
+        produto2.setMoeda(Moeda.BRL);
+        produto2.setCotacaoMoeda(BigDecimal.ONE);
+        produto2.setPrecoCustoEmReais(BigDecimal.valueOf(370));
         produto2.setPrecoVenda(BigDecimal.valueOf(430));
         produto2.setQuantidadeEstoque(25);
         produto2.setDemandaBase(80);
@@ -144,6 +154,9 @@ class ProdutoControllerTest {
         produto.setCategoriaId(1L);
         produto.setCategoriaNome("Eletrônicos");
         produto.setPrecoCusto(BigDecimal.valueOf(450));
+        produto.setMoeda(Moeda.BRL);
+        produto.setCotacaoMoeda(BigDecimal.ONE);
+        produto.setPrecoCustoEmReais(BigDecimal.valueOf(450));
         produto.setPrecoVenda(BigDecimal.valueOf(600));
         produto.setQuantidadeEstoque(10);
         produto.setDemandaBase(100);
@@ -183,6 +196,7 @@ class ProdutoControllerTest {
         requestDTO.setDescricao("Descricao teste");
         requestDTO.setCategoriaId(1L);
         requestDTO.setPrecoCusto(BigDecimal.valueOf(450));
+        requestDTO.setMoeda(Moeda.BRL);
         requestDTO.setPrecoVenda(BigDecimal.valueOf(600));
         requestDTO.setQuantidadeEstoque(10);
         requestDTO.setDemandaBase(100);
@@ -195,6 +209,9 @@ class ProdutoControllerTest {
         responseDTO.setCategoriaId(1L);
         responseDTO.setCategoriaNome("Eletrônicos");
         responseDTO.setPrecoCusto(BigDecimal.valueOf(450));
+        responseDTO.setMoeda(Moeda.BRL);
+        responseDTO.setCotacaoMoeda(BigDecimal.ONE);
+        responseDTO.setPrecoCustoEmReais(BigDecimal.valueOf(450));
         responseDTO.setPrecoVenda(BigDecimal.valueOf(600));
         responseDTO.setQuantidadeEstoque(10);
         responseDTO.setDemandaBase(100);
@@ -221,6 +238,7 @@ class ProdutoControllerTest {
         requestDTO.setNome("");
         requestDTO.setCategoriaId(1L);
         requestDTO.setPrecoCusto(BigDecimal.valueOf(450));
+        requestDTO.setMoeda(Moeda.BRL);
         requestDTO.setPrecoVenda(BigDecimal.valueOf(600));
         requestDTO.setQuantidadeEstoque(10);
 
@@ -239,6 +257,7 @@ class ProdutoControllerTest {
         ProdutoRequestDTO requestDTO = new ProdutoRequestDTO();
         requestDTO.setNome("Produto teste 1");
         requestDTO.setPrecoCusto(BigDecimal.valueOf(450));
+        requestDTO.setMoeda(Moeda.BRL);
         requestDTO.setPrecoVenda(BigDecimal.valueOf(600));
         requestDTO.setQuantidadeEstoque(10);
 
@@ -258,6 +277,7 @@ class ProdutoControllerTest {
         requestDTO.setNome("Produto teste 1");
         requestDTO.setCategoriaId(1L);
         requestDTO.setPrecoCusto(BigDecimal.valueOf(-1));
+        requestDTO.setMoeda(Moeda.BRL);
         requestDTO.setPrecoVenda(BigDecimal.valueOf(600));
         requestDTO.setQuantidadeEstoque(10);
 
@@ -277,6 +297,7 @@ class ProdutoControllerTest {
         requestDTO.setNome("Produto teste 1");
         requestDTO.setCategoriaId(1L);
         requestDTO.setPrecoCusto(BigDecimal.valueOf(450));
+        requestDTO.setMoeda(Moeda.BRL);
         requestDTO.setPrecoVenda(BigDecimal.valueOf(600));
         requestDTO.setQuantidadeEstoque(10);
 
@@ -301,6 +322,7 @@ class ProdutoControllerTest {
         requestDTO.setNome("Produto teste 1");
         requestDTO.setCategoriaId(1L);
         requestDTO.setPrecoCusto(BigDecimal.valueOf(450));
+        requestDTO.setMoeda(Moeda.BRL);
         requestDTO.setPrecoVenda(BigDecimal.valueOf(600));
         requestDTO.setQuantidadeEstoque(10);
 

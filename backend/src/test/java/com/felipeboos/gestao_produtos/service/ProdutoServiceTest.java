@@ -4,11 +4,13 @@ import com.felipeboos.gestao_produtos.dto.produto.ProdutoRequestDTO;
 import com.felipeboos.gestao_produtos.dto.produto.ProdutoResponseDTO;
 import com.felipeboos.gestao_produtos.dto.produto.ProdutoUpdateDTO;
 import com.felipeboos.gestao_produtos.entity.Categoria;
+import com.felipeboos.gestao_produtos.entity.Moeda;
 import com.felipeboos.gestao_produtos.entity.Produto;
 import com.felipeboos.gestao_produtos.exception.RecursoDuplicadoException;
 import com.felipeboos.gestao_produtos.exception.RecursoNaoEncontradoException;
 import com.felipeboos.gestao_produtos.repository.CategoriaRepository;
 import com.felipeboos.gestao_produtos.repository.ProdutoRepository;
+import com.felipeboos.gestao_produtos.service.cambio.CambioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,9 @@ public class ProdutoServiceTest {
 
     @Mock
     private CategoriaRepository categoriaRepository;
+
+    @Mock
+    private CambioService cambioService;
 
     @InjectMocks
     private ProdutoService service;
@@ -65,6 +70,9 @@ public class ProdutoServiceTest {
                 .nome("Produto teste 1")
                 .categoria(categoria)
                 .precoCusto(BigDecimal.valueOf(450))
+                .moeda(Moeda.BRL)
+                .cotacaoMoeda(BigDecimal.ONE)
+                .precoCustoEmReais(BigDecimal.valueOf(450))
                 .precoVenda(BigDecimal.valueOf(600))
                 .quantidadeEstoque(10)
                 .demandaBase(100)
@@ -75,6 +83,7 @@ public class ProdutoServiceTest {
         produtoRequestDTO.setNome("Produto teste 1");
         produtoRequestDTO.setCategoriaId(1L);
         produtoRequestDTO.setPrecoCusto(BigDecimal.valueOf(450));
+        produtoRequestDTO.setMoeda(Moeda.BRL);
         produtoRequestDTO.setPrecoVenda(BigDecimal.valueOf(600));
         produtoRequestDTO.setQuantidadeEstoque(10);
         produtoRequestDTO.setDemandaBase(100);
@@ -84,6 +93,7 @@ public class ProdutoServiceTest {
         produtoUpdateDTOCompleto.setNome("Nome teste alteração");
         produtoUpdateDTOCompleto.setCategoriaId(2L);
         produtoUpdateDTOCompleto.setPrecoCusto(BigDecimal.valueOf(470));
+        produtoUpdateDTOCompleto.setMoeda(Moeda.BRL);
         produtoUpdateDTOCompleto.setPrecoVenda(BigDecimal.valueOf(580));
         produtoUpdateDTOCompleto.setQuantidadeEstoque(8);
         produtoUpdateDTOCompleto.setDemandaBase(90);
@@ -102,6 +112,7 @@ public class ProdutoServiceTest {
     void t1_deveSalvarProdutoComSucesso() {
         when(repository.existsByNome("Produto teste 1")).thenReturn(false);
         when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(cambioService.obterCotacao(Moeda.BRL)).thenReturn(BigDecimal.ONE);
         when(repository.saveAndFlush(any(Produto.class))).thenReturn(produto);
 
         ProdutoResponseDTO response = service.salvarProduto(produtoRequestDTO);
@@ -119,7 +130,7 @@ public class ProdutoServiceTest {
     @Test
     @DisplayName("T2 - ProdutoServiceTest - Deve lançar exceção ao tentar salvar produto com nome já cadastrado")
     void t2_deveLancarExcecaoAoTentarSalvarProdutoComNomeJaCadastrado() {
-       when(repository.existsByNome("Produto teste 1")).thenReturn(true);
+        when(repository.existsByNome("Produto teste 1")).thenReturn(true);
 
         RecursoDuplicadoException exception = assertThrows(RecursoDuplicadoException.class,
                 () -> service.salvarProduto(produtoRequestDTO));
@@ -143,6 +154,7 @@ public class ProdutoServiceTest {
 
         verify(repository, times(1)).existsByNome("Produto teste 1");
         verify(categoriaRepository, times(1)).findById(1L);
+        verifyNoInteractions(cambioService);
         verify(repository, never()).saveAndFlush(any(Produto.class));
     }
 
@@ -219,6 +231,9 @@ public class ProdutoServiceTest {
                 .nome("Produto teste 2")
                 .categoria(categoria)
                 .precoCusto(BigDecimal.valueOf(370))
+                .moeda(Moeda.BRL)
+                .cotacaoMoeda(BigDecimal.ONE)
+                .precoCustoEmReais(BigDecimal.valueOf(370))
                 .precoVenda(BigDecimal.valueOf(430))
                 .quantidadeEstoque(25)
                 .demandaBase(80)
@@ -294,6 +309,7 @@ public class ProdutoServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.of(produto));
         when(repository.existsByNome("Nome teste alteração")).thenReturn(false);
         when(categoriaRepository.findById(2L)).thenReturn(Optional.of(categoria2));
+        when(cambioService.obterCotacao(Moeda.BRL)).thenReturn(BigDecimal.ONE);
 
         service.atualizarProdutoPorId(1L, produtoUpdateDTOCompleto);
 
@@ -305,12 +321,14 @@ public class ProdutoServiceTest {
         assertEquals(8, produto.getQuantidadeEstoque());
         assertEquals(90, produto.getDemandaBase());
         assertEquals(0, produto.getFatorElasticidade().compareTo(BigDecimal.valueOf(0.06)));
+        assertEquals(Moeda.BRL, produto.getMoeda());
+        assertEquals(0, produto.getCotacaoMoeda().compareTo(BigDecimal.ONE));
+        assertEquals(0, produto.getPrecoCustoEmReais().compareTo(BigDecimal.valueOf(470)));
 
         verify(repository, times(1)).findById(1L);
         verify(repository, times(1)).existsByNome("Nome teste alteração");
         verify(categoriaRepository, times(1)).findById(2L);
         verify(repository, times(1)).saveAndFlush(produto);
-
     }
 
     @Test
@@ -351,20 +369,22 @@ public class ProdutoServiceTest {
     void t15_deveAtualizarApenasCamposInformados() {
         when(repository.findById(1L)).thenReturn(Optional.of(produto));
         when(repository.existsByNome("Nome teste alteração parcial")).thenReturn(false);
+        when(cambioService.obterCotacao(Moeda.BRL)).thenReturn(BigDecimal.ONE);
 
         service.atualizarProdutoPorId(1L, produtoUpdateDTOParcial);
 
-        // Campos alterados
         assertEquals("Nome teste alteração parcial", produto.getNome());
         assertEquals(0, produto.getPrecoCusto().compareTo(BigDecimal.valueOf(480)));
 
-        // Campos não alterados
         assertEquals(1L, produto.getId());
         assertEquals(1L, produto.getCategoria().getId());
         assertEquals(0, produto.getPrecoVenda().compareTo(BigDecimal.valueOf(600)));
         assertEquals(10, produto.getQuantidadeEstoque());
         assertEquals(100, produto.getDemandaBase());
         assertEquals(0, produto.getFatorElasticidade().compareTo(BigDecimal.valueOf(0.05)));
+        assertEquals(Moeda.BRL, produto.getMoeda());
+        assertEquals(0, produto.getCotacaoMoeda().compareTo(BigDecimal.ONE));
+        assertEquals(0, produto.getPrecoCustoEmReais().compareTo(BigDecimal.valueOf(480)));
 
         verify(repository, times(1)).findById(1L);
         verify(repository, times(1)).existsByNome("Nome teste alteração parcial");
@@ -377,17 +397,20 @@ public class ProdutoServiceTest {
     void t16_deveAtualizarCategoriaComSucesso() {
         when(repository.findById(1L)).thenReturn(Optional.of(produto));
         when(categoriaRepository.findById(2L)).thenReturn(Optional.of(categoria2));
+        when(cambioService.obterCotacao(Moeda.BRL)).thenReturn(BigDecimal.ONE);
 
         service.atualizarProdutoPorId(1L, produtoUpdateDTOSomenteCategoria);
 
         assertEquals(2L, produto.getCategoria().getId());
         assertEquals("Alimentos", produto.getCategoria().getNome());
 
-        // Campos não alterados
         assertEquals(1L, produto.getId());
         assertEquals("Produto teste 1", produto.getNome());
         assertEquals(0, produto.getPrecoCusto().compareTo(BigDecimal.valueOf(450)));
         assertEquals(0, produto.getPrecoVenda().compareTo(BigDecimal.valueOf(600)));
+        assertEquals(Moeda.BRL, produto.getMoeda());
+        assertEquals(0, produto.getCotacaoMoeda().compareTo(BigDecimal.ONE));
+        assertEquals(0, produto.getPrecoCustoEmReais().compareTo(BigDecimal.valueOf(450)));
 
         verify(repository, times(1)).findById(1L);
         verify(repository, never()).existsByNome(anyString());

@@ -1,5 +1,6 @@
 package com.felipeboos.gestao_produtos.dto.produto;
 
+import com.felipeboos.gestao_produtos.entity.Moeda;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -25,8 +26,11 @@ public class ProdutoRequestDTO {
     @PositiveOrZero(message = "O preco de custo nao pode ser negativo")
     private BigDecimal precoCusto;
 
+    @NotNull(message = "A moeda eh obrigatoria")
+    private Moeda moeda;
+
     @NotNull(message = "O preco de venda eh obrigatorio")
-    @PositiveOrZero(message = "O preco ce venda nao pode ser negativo")
+    @PositiveOrZero(message = "O preco de venda nao pode ser negativo")
     private BigDecimal precoVenda;
 
     @NotNull(message = "A quantidade em estoque eh obrigatoria")

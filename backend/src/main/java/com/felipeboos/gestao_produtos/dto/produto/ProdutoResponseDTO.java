@@ -1,7 +1,9 @@
 package com.felipeboos.gestao_produtos.dto.produto;
 
+import com.felipeboos.gestao_produtos.entity.Moeda;
 import com.felipeboos.gestao_produtos.entity.Produto;
 import lombok.Data;
+
 import java.math.BigDecimal;
 
 @Data
@@ -15,6 +17,10 @@ public class ProdutoResponseDTO {
     private String categoriaNome;
 
     private BigDecimal precoCusto;
+    private Moeda moeda;
+    private BigDecimal cotacaoMoeda;
+    private BigDecimal precoCustoEmReais;
+
     private BigDecimal precoVenda;
 
     private Integer quantidadeEstoque;
@@ -35,6 +41,10 @@ public class ProdutoResponseDTO {
         }
 
         dto.setPrecoCusto(produto.getPrecoCusto());
+        dto.setMoeda(produto.getMoeda());
+        dto.setCotacaoMoeda(produto.getCotacaoMoeda());
+        dto.setPrecoCustoEmReais(produto.getPrecoCustoEmReais());
+
         dto.setPrecoVenda(produto.getPrecoVenda());
         dto.setQuantidadeEstoque(produto.getQuantidadeEstoque());
 

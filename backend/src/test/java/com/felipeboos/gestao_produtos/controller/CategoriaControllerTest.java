@@ -12,19 +12,27 @@ import com.felipeboos.gestao_produtos.service.CategoriaService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,9 +43,10 @@ class CategoriaControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockBean
     private CategoriaService service;
 
     @Test
@@ -66,11 +75,10 @@ class CategoriaControllerTest {
                 .thenThrow(new RecursoNaoEncontradoException("Nenhuma categoria encontrada para o id informado"));
 
         mockMvc.perform(get("/categorias/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.mensagem").value(
-                        "Nenhuma categoria encontrada para o id informado"))
+                .andExpect(jsonPath("$.mensagem").value("Nenhuma categoria encontrada para o id informado"))
                 .andExpect(jsonPath("$.timestamp").exists());
 
         verify(service, times(1)).buscarCategoriaPorId(1L);
@@ -89,8 +97,7 @@ class CategoriaControllerTest {
         categoria2.setNome("Alimentos");
         categoria2.setDescricao("Categoria teste 2");
 
-        when(service.listarTodasAsCategorias())
-                .thenReturn(List.of(categoria1, categoria2));
+        when(service.listarTodasAsCategorias()).thenReturn(List.of(categoria1, categoria2));
 
         mockMvc.perform(get("/categorias"))
                 .andExpect(status().isOk())
@@ -132,8 +139,7 @@ class CategoriaControllerTest {
         mockMvc.perform(get("/categorias").param("nome", "Inexistente"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.mensagem")
-                        .value("Nenhuma categoria encontrada para o nome informado"))
+                .andExpect(jsonPath("$.mensagem").value("Nenhuma categoria encontrada para o nome informado"))
                 .andExpect(jsonPath("$.timestamp").exists());
 
         verify(service, times(1)).buscarCategoriaPorNome("Inexistente");
@@ -154,8 +160,8 @@ class CategoriaControllerTest {
         when(service.salvarCategoria(any(CategoriaRequestDTO.class))).thenReturn(responseDTO);
 
         mockMvc.perform(post("/categorias")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.nome").value("Eletrônicos"))
@@ -172,8 +178,8 @@ class CategoriaControllerTest {
         requestDTO.setDescricao("Categoria teste");
 
         mockMvc.perform(post("/categorias")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0]").value("nome: O nome da categoria eh obrigatorio"));
 
@@ -188,11 +194,10 @@ class CategoriaControllerTest {
         requestDTO.setDescricao("Categoria de teste");
 
         mockMvc.perform(post("/categorias")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0]")
-                        .value("nome: O nome da categoria deve ter no maximo 50 caracteres"));
+                .andExpect(jsonPath("$[0]").value("nome: O nome da categoria deve ter no maximo 50 caracteres"));
 
         verify(service, never()).salvarCategoria(any(CategoriaRequestDTO.class));
     }
@@ -205,11 +210,10 @@ class CategoriaControllerTest {
         requestDTO.setDescricao("a".repeat(256));
 
         mockMvc.perform(post("/categorias")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0]")
-                        .value("descricao: A descricao deve ter no maximo 255 caracteres"));
+                .andExpect(jsonPath("$[0]").value("descricao: A descricao deve ter no maximo 255 caracteres"));
 
         verify(service, never()).salvarCategoria(any(CategoriaRequestDTO.class));
     }
@@ -217,7 +221,6 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("T10 - CategoriaControllerTest - Deve retornar Conflict ao salvar categoria com nome duplicado")
     void t10_deveRetornarConflictAoSalvarCategoriaComNomeDuplicado() throws Exception {
-
         CategoriaRequestDTO requestDTO = new CategoriaRequestDTO();
         requestDTO.setNome("Eletrônicos");
         requestDTO.setDescricao("Categoria de eletrônicos");
@@ -230,8 +233,7 @@ class CategoriaControllerTest {
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409))
-                .andExpect(jsonPath("$.mensagem")
-                        .value("Já existe uma categoria cadastrada com esse nome"))
+                .andExpect(jsonPath("$.mensagem").value("Já existe uma categoria cadastrada com esse nome"))
                 .andExpect(jsonPath("$.timestamp").exists());
 
         verify(service, times(1)).salvarCategoria(any(CategoriaRequestDTO.class));
@@ -265,8 +267,7 @@ class CategoriaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0]")
-                        .value("nome: size must be between 0 and 50"));
+                .andExpect(jsonPath("$[0]").value("nome: size must be between 0 and 50"));
 
         verify(service, never()).atualizarCategoriaPorId(anyLong(), any(CategoriaUpdateDTO.class));
     }
@@ -282,8 +283,7 @@ class CategoriaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0]")
-                        .value("descricao: size must be between 0 and 255"));
+                .andExpect(jsonPath("$[0]").value("descricao: size must be between 0 and 255"));
 
         verify(service, never()).atualizarCategoriaPorId(anyLong(), any(CategoriaUpdateDTO.class));
     }
@@ -303,8 +303,7 @@ class CategoriaControllerTest {
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.mensagem")
-                        .value("Nenhuma categoria encontrada para o Id informado"))
+                .andExpect(jsonPath("$.mensagem").value("Nenhuma categoria encontrada para o Id informado"))
                 .andExpect(jsonPath("$.timestamp").exists());
 
         verify(service, times(1)).atualizarCategoriaPorId(eq(1L), any(CategoriaUpdateDTO.class));
@@ -325,8 +324,7 @@ class CategoriaControllerTest {
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409))
-                .andExpect(jsonPath("$.mensagem")
-                        .value("Já existe uma categoria cadastrada com o nome informado"))
+                .andExpect(jsonPath("$.mensagem").value("Já existe uma categoria cadastrada com o nome informado"))
                 .andExpect(jsonPath("$.timestamp").exists());
 
         verify(service, times(1)).atualizarCategoriaPorId(eq(1L), any(CategoriaUpdateDTO.class));
@@ -352,8 +350,7 @@ class CategoriaControllerTest {
         mockMvc.perform(delete("/categorias/{id}", 1L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.mensagem")
-                        .value("Nenhuma categoria encontrada para o id informado"))
+                .andExpect(jsonPath("$.mensagem").value("Nenhuma categoria encontrada para o id informado"))
                 .andExpect(jsonPath("$.timestamp").exists());
 
         verify(service, times(1)).deletarCategoriaPorId(1L);

@@ -1,7 +1,9 @@
 package com.felipeboos.gestao_produtos.dto.produto;
 
+import com.felipeboos.gestao_produtos.entity.Moeda;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+
 import java.math.BigDecimal;
 
 @Data
@@ -19,6 +21,8 @@ public class ProdutoUpdateDTO {
     @PositiveOrZero(message = "O preco de custo nao pode ser negativo")
     @Digits(integer = 10, fraction = 2)
     private BigDecimal precoCusto;
+
+    private Moeda moeda;
 
     @PositiveOrZero(message = "O preco de venda nao pode ser negativo")
     @Digits(integer = 10, fraction = 2)
