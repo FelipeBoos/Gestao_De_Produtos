@@ -49,8 +49,11 @@ services:
     container_name: pricelab-grafana
     ports:
       - "3000:3000"
+    volumes:
+      - pricelab_grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
 
 volumes:
   pricelab_postgres_data:
+  pricelab_grafana_data:
